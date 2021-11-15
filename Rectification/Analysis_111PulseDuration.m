@@ -5,7 +5,7 @@ TotalRepetitions = 3;
 Time = -0.75:0.03:3;%[ps]
 PulseDurationNum = 11;%
 
-PathMain = 'C:\Users\yanna\Dropbox\PhD\Research\Photo-Dember\Experiment\Session 2\111 Pulse duration\';
+PathMain = 'measurement_data\111 Pulse duration\';
 MainFolderList = dir(PathMain);
 
 for i = 1:PulseDurationNum
