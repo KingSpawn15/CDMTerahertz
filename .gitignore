@@ -4,3 +4,4 @@
 *.fig
 measurement_data/*
 *.dm4
+*.asv
