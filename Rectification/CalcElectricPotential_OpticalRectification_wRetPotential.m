@@ -26,6 +26,10 @@ xprime = (-1:5e-2:1)*round(LaserSpotSigma*3,5);%[m]
 yprime = (0:5e-2:1)*1e-6;%[m]
 zprime = xprime;%[m]
 
+dd_xprime = xprime(2) - xprime(1);
+dd_yprime = yprime(2) - yprime(1);
+dd_zprime = zprime(2) - zprime(1);
+
 z0 = 30e-6;%[m] Sample +/-z boundary
 
 [Xprime,Yprime,Zprime,Z] = ndgrid(xprime,yprime,zprime,z);
@@ -51,9 +55,11 @@ dt = t(2) - t(1);
 
 V = zeros(length(tCSubSampled),length(z));
 
+t_r = (1/c)*sqrt((x0-Xprime).^2+(y0-Yprime).^2+(Z-Zprime).^2);
 parfor IndTime = 1:length(tCSubSampled)
     
-    Tprime = tCSubSampled(IndTime) - (1/c)*sqrt((x0-Xprime).^2+(y0-Yprime).^2+(Z-Zprime).^2);
+    disp(strcat('IndTime', num2str(IndTime), ' out of ', num2str(length(tCSubSampled))));
+    Tprime = tCSubSampled(IndTime) - t_r;
 
     LaserT = exp(-(Tprime-t0).^2./LaserPulseTimeSigma.^2);
     LaserT(Tprime<0) = 0;
@@ -75,10 +81,12 @@ parfor IndTime = 1:length(tCSubSampled)
     dPzdt(Tprime<0) = 0;
     
     dA = (mu0/(4*pi)).*dPzdt.*GreenKernel;
-
-    V(IndTime,:) = trapz(zprime,trapz(xprime, (trapz(yprime,(dPhi-v.*dA),2) + dPhi_Y0) ,1),3)...
-                   + trapz(xprime,trapz(yprime,dPhi_Z0,2),1);
- 
+    
+%     V(IndTime,:) = trapz(zprime,trapz(xprime, (trapz(yprime,(dPhi-v.*dA),2) + dPhi_Y0) ,1),3)...
+%         + trapz(xprime,trapz(yprime,dPhi_Z0,2),1);
+    
+    V(IndTime,:) = trapz(dd_zprime,trapz(dd_xprime, (trapz(dd_yprime,(dPhi-v.*dA),2) + dPhi_Y0) ,1),3)...
+        + trapz(dd_xprime,trapz(dd_yprime,dPhi_Z0,2),1);
 end
 
 %% Return to original t
