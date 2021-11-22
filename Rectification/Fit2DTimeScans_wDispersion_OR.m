@@ -75,7 +75,8 @@ for PolInd = 1:Length
 
     %% Calculate electric potential
 
-    [Phi] = CalcElectricPotential_OpticalRectification_wRetPotential(PulseEnergy,t,z,x0,y0,Theta_Pol(PolInd));
+    [Phi] = CalcElectricPotential_OpticalRectification_wRetPotential(PulseEnergy,t,z,x0,y0,...
+        Theta_Pol(PolInd), v);
     % Phi is V
     Phi = Phi.*PhiGainFactor_OR;
 
