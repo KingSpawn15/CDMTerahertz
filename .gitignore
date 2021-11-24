@@ -6,3 +6,4 @@ measurement_data/*
 *.dm4
 *.asv
 *.mat
+results/*
