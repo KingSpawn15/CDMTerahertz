@@ -4,7 +4,9 @@ clc; close all; clear all;
 %\111_STEM_x1.5k_StaticSpot_10nJ_wTimeScan20210617061959\ - Used in figures
 %\111_STEM_x1.5k_StaticSpot_10nJ_wTimeScan20210614231717\ - Focus 0.8ps around t0
 
-PathMain = 'measurement_data\Polarization\111_STEM_x1.5k_StaticSpot_10nJ_wTimeScan20210617061959\';
+% PathMain = 'measurement_data\Polarization\111_STEM_x1.5k_StaticSpot_10nJ_wTimeScan20210617061959\';
+PathMain = '..\..\..\..\..\..\Desktop\measurement_data\Polarization\111_STEM_x1.5k_StaticSpot_10nJ_wTimeScan20210617061959\';
+
 FolderList = dir(PathMain);
 
 % 1-10_STEM_x1.5k_StaticSpot_10nJ_wTimeScan20210614115140
