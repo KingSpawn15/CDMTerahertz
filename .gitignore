@@ -7,3 +7,6 @@ measurement_data/*
 *.asv
 *.mat
 results/*
+*.prj
+resources/*
+
