@@ -49,9 +49,9 @@ discretization = DiscretizationSteps(ddt, delay_max, ddz, zmax, fs, l);
 
 sample_parameters = Sample(x0, y0);
 
-for interaction_gain_factor_photodember = [0.01, 0.01, 1]
-    for method = [ "combination" , "rectification" ]
-        for theta_pol_degree = [0:5:90]
+for interaction_gain_factor_photodember = [0.5]
+    for method = [ "combination" ]
+        for theta_pol_degree = [0,45,90]
             theta_pol = theta_pol_degree.*(pi/180);
             las = Laser(pulse_energy_experiment, pulse_energy_gain_factor, theta_pol);
             eels = EELS(elec, las, discretization, sample_parameters);
