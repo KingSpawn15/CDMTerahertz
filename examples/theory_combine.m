@@ -17,8 +17,11 @@ electron_theta = -5*pi/180;
 electron_velocity_c = 0.7;
 
 % laser parameters
-pulse_energy_experiment = 10 * 1e-9;
-pulse_energy_gain_factor = 0.05;
+laser_parameters.pulse_energy_experiment = 10 * 1e-9;
+laser_parameters.pulse_energy_gain_factor = 0.05;
+laser_parameters.laser_spot_fwhm = 40e-6;
+laser_parameters.theta_pol = 45*pi/180;
+laser_check = Laser(laser_parameters);
 % theta_pol_degree = 90;
 % theta_pol = theta_pol_degree.*(pi/180);
 
@@ -48,6 +51,7 @@ elec = UTEMElectron(electron_total_energy,...
 discretization = DiscretizationSteps(ddt, delay_max, ddz, zmax, fs, l);
 
 sample_parameters = Sample(x0, y0);
+
 
 for interaction_gain_factor_photodember = [0.5]
     for method = [ "combination" ]

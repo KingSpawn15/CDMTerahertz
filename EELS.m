@@ -134,8 +134,7 @@ classdef EELS
                     
                 end
             end
-            
-            
+                      
             psi = psi_sum;
             psi_incoherent = psi./trapz(e_w,psi,2);
             

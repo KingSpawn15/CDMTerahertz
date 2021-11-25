@@ -6,18 +6,32 @@ classdef Laser
         pulse_energy_gain_factor
         theta_pol
         pulse_energy
-        
+        laser_spot_fwhm
+        laser_spot_sigma
     end
     
     methods
         
-        function self = Laser(pulse_energy_experiment, pulse_energy_gain_factor, theta_pol)
+        function self = Laser(laser_parameters)
             
-            self.pulse_energy = pulse_energy_gain_factor * pulse_energy_experiment;
-            self.theta_pol = theta_pol;
+            self.pulse_energy = laser_parameters.pulse_energy_gain_factor * laser_parameters.pulse_energy_experiment;
+            self.theta_pol = laser_parameters.theta_pol;
             
+            if isfield(laser_parameters , 'laser_spot_fwhm')
+                self.laser_spot_fwhm = laser_parameters.laser_spot_fwhm;
+                self.laser_spot_sigma = self.calculate_sigma(self.laser_spot_fwhm);
+            end
         end
         
     end
+    
+    methods(Static)
+        
+        function sigma = calculate_sigma(fwhm)
+            sigma = fwhm./(2*sqrt(2*log(2)));
+        end
+        
+    end
+    
 end
 
