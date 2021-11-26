@@ -22,7 +22,16 @@ classdef Laser
                 self.laser_spot_sigma = self.calculate_sigma(self.laser_spot_fwhm);
             end
         end
-        
+       
+        function n_exc = excited_carriers(self, alpha, hnew)
+            
+            const = utils.constants_fundamantal();
+            Q_E = const.('Q_E');
+            excited_volume = (pi/4)*self.laser_spot_fwhm^2*alpha^(-1);%[m^3]
+            n_exc = self.pulse_energy/Q_E/hnew/excited_volume;%[m^-3]
+
+        end
+
     end
     
     methods(Static)

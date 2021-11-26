@@ -69,6 +69,14 @@ classdef IndiumArsenide
             
         end
         
+        function omega_y = calculate_omega_y(self, n_exc, yprime_grid)
+            const = utils.constants_fundamantal();
+            Q_E = const.('Q_E');
+            
+            omega_y = sqrt( (Q_E^2/self.kappa).*(n_exc.*exp(-self.alpha.*yprime_grid).*...
+                (1/self.me0tilda+1/self.mh)+self.n_eq/self.m_eq) - (self.gamma/2)^2 );
+        end
+        
     end
 end
 
