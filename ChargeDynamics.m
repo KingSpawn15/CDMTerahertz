@@ -73,7 +73,7 @@ classdef ChargeDynamics
             theta_pol = laser.theta_pol;
             electron_velocity = electron.electron_velocity;
             t_r = (1/C)*sqrt((discretization.x0-XPRIME).^2+(discretization.y0-YPRIME).^2+(Z-ZPRIME).^2);
-            for time_ind = 1:length(t_c_subsampled)
+            parfor time_ind = 1:length(t_c_subsampled)
                 
                 disp(strcat('time_ind', num2str(time_ind), ' out of ', num2str(length(t_c_subsampled))));
                 t_prime = t_c_subsampled(time_ind) - t_r;

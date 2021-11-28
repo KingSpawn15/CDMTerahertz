@@ -1,4 +1,4 @@
-classdef UTEMElectron
+classdef UTEMElectron < handle
     %UTEMELECTRON Summary of this class goes here
     %   Detailed explanation goes here
     

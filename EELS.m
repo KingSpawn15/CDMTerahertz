@@ -5,22 +5,20 @@ classdef EELS
     properties
         laser
         electron
-        sample_parameters
         discretization
         material
         subsampling
     end
     
     methods
-        function self = EELS(electron, laser, discretization, sample_parameters , material)
+        function self = EELS(electron, laser, discretization , material , subsampling)
             %WAVEFUNCTION Construct an instance of this class
             %   Detailed explanation goes here
             self.laser = laser ;
             self.electron = electron ;
-            self.sample_parameters = sample_parameters;
             self.discretization = discretization;
             self.material = material;
-            self.subsampling.tc_subsampling = 30;
+            self.subsampling = subsampling;
         end
         
         function interact_v = interaction_v(self, method, interaction_gain_factor,...
