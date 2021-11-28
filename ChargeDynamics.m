@@ -37,7 +37,7 @@ classdef ChargeDynamics
             zprime = discretization.zprime;%[m]
             
             d_xprime = discretization.d_xprime;
-            d_yprime = discretization.d_xprime;
+            d_yprime = discretization.d_yprime;
             d_zprime = discretization.d_xprime;
             
             XPRIME = discretization.XPRIME;
@@ -47,7 +47,7 @@ classdef ChargeDynamics
             Z = discretization.Z;
             z_max = discretization.z_max;%[m] Sample +/-z boundary
             
-            green_kernel  = ChargeDynamics.calculate_green_kernel(discretization);
+            green_kernel  = ChargeDynamics.calculate_green_kernel_rectification(discretization);
             
             % Down sample t to improve run speed
             
@@ -73,7 +73,7 @@ classdef ChargeDynamics
             theta_pol = laser.theta_pol;
             electron_velocity = electron.electron_velocity;
             t_r = (1/C)*sqrt((discretization.x0-XPRIME).^2+(discretization.y0-YPRIME).^2+(Z-ZPRIME).^2);
-            parfor time_ind = 1:length(t_c_subsampled)
+            for time_ind = 1:length(t_c_subsampled)
                 
                 disp(strcat('time_ind', num2str(time_ind), ' out of ', num2str(length(t_c_subsampled))));
                 t_prime = t_c_subsampled(time_ind) - t_r;
@@ -101,7 +101,9 @@ classdef ChargeDynamics
                 
                 %     V(time_ind,:) = trapz(zprime,trapz(xprime, (trapz(yprime,(dPhi-v.*dA),2) + dPhi_Y0) ,1),3)...
                 %         + trapz(xprime,trapz(yprime,dPhi_Z0,2),1);
-                
+                if (time_ind == 207)
+                    disp("");
+                end
                 interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi-electron_velocity.*dA),2) + dPhi_Y0) ,1),3)...
                     + trapz(d_xprime,trapz(d_yprime,dPhi_Z0,2),1);
             end
@@ -193,6 +195,13 @@ classdef ChargeDynamics
             
         end
         
+        function green_kernel = calculate_green_kernel_rectification(discretization)
+            %METHOD1 Summary of this method goes here
+            %   Detailed explanation goes here
+            green_kernel = ((discretization.x0-discretization.XPRIME).^2 + ...
+                (discretization.y0-discretization.YPRIME).^2+(discretization.Z-discretization.ZPRIME).^2).^(-1/2);
+            
+        end
         
         function g = dpdt(laser , material, t_prime, YPRIME)
             
