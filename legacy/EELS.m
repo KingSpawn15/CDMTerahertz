@@ -1,4 +1,4 @@
-classdef Copy_of_EELS
+classdef EELS
     %WAVEFUNCTION Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -7,20 +7,16 @@ classdef Copy_of_EELS
         electron
         sample_parameters
         discretization
-        material
-        subsampling
     end
     
     methods
-        function self = Copy_of_EELS(electron, laser, discretization, sample_parameters , material)
+        function self = EELS(electron, laser, discretization, sample_parameters)
             %WAVEFUNCTION Construct an instance of this class
             %   Detailed explanation goes here
             self.laser = laser ;
             self.electron = electron ;
             self.sample_parameters = sample_parameters;
             self.discretization = discretization;
-            self.material = material;
-            self.subsampling.tc_subsampling = 30;
         end
         
         function interact_v = interaction_v(self, method, interaction_gain_factor,...
@@ -49,13 +45,6 @@ classdef Copy_of_EELS
                         CalcElectricPotential_wXprimeZprimeInt_wRetPotential(self.laser.pulse_energy,...
                         self.discretization.t,self.discretization.z,...
                         self.sample_parameters.x0,self.sample_parameters.y0) * interaction_gain_factor_photodember;
-                case "pd_check" 
-                    interact_v = ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
-                        self.laser , self.subsampling);
-                case "rectification_check"
-                    interact_v = ChargeDynamics.interaction_potential_rectification(self.discretization,...
-                        self.material,...
-                        self.laser , self.electron, self.subsampling);
             end
             
             interact_v = interaction_gain_factor * interact_v;

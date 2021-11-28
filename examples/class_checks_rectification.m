@@ -21,14 +21,12 @@ discretization_params.ddz = 1e-6;     discretization_params.zmax = 1e-4;
 discretization_params.z_max = 30e-6;
 discretization = Discretization(discretization_params);
 
-electron_total_energy = 0.8;
-electron_total_time_fs = 150;
-electron_time_coherent_fwhm_fs = 20;
-electron_theta = -5*pi/180;
-electron_velocity_c = 0.7;
-elec = UTEMElectron(electron_total_energy,...
-    electron_total_time_fs, electron_time_coherent_fwhm_fs,...
-    electron_theta, electron_velocity_c);
+utem_parameters.electron_total_energy = 0.8;
+utem_parameters.electron_total_time_fs = 150;
+utem_parameters.electron_time_coherent_fwhm_fs = 20;
+utem_parameters.electron_theta = -5*pi/180;
+utem_parameters.electron_velocity_c = 0.7;
+elec = UTEMElectron(utem_parameters);
 
 
 % % subsampling
