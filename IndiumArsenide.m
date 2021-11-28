@@ -18,34 +18,46 @@ classdef IndiumArsenide
         epsilon_e
         v_t
         me0tilda
+        d14
 
     end
     
     methods
         function self = IndiumArsenide()
             self.alpha = 7e6;%[m^-1]
-            self.kappa = 12.3*epsilon0;
+            
+            const = utils.constants_fundamantal();
+            EPSILON_0 = const.('EPSILON_0');
+            M_E = const.('M_E');
+            self.kappa = 12.3*EPSILON_0;
             self.gamma = 3.3e12;%[s^-1]
-            self.me = 0.022*me0;%[kg]
-            self.mh = 0.6*me0;%[kg]
+            self.me = 0.022*M_E;%[kg]
+            self.mh = 0.6*M_E;%[kg]
             self.lambda = 0.8;%[um]
-            self.hnew = 1.24./lambda;%[eV]
+            self.hnew = 1.24./self.lambda;%[eV]
             self.eg = 0.354;%[eV]
             self.alpha_gamma = 2.2;%[eV^-1]
             self.n_eq = 1e17*1e6;%[m^-3]%From resistivity measurement!
-            self.m_eq = mh;%p-type InAs
+            self.m_eq = self.mh;%p-type InAs
             
-            self.epsilon_e = self.photoexcited_electron_energy(self);
+            self.epsilon_e = self.photoexcited_electron_energy();
             self.v_t = self.velocity_t();
-            self.me0tilda = photoelectron_mass();
+            self.me0tilda = self.photoelectron_mass();
+            
+            self.d14 = 237.6e-12;%[V/m]
+            % Linear extrapolation in frequency, based on data from:
+            % Weber, Marvin J. Handbook of optical materials. CRC press, 2018.
+            % Assuming omega = 1.885e13[s^-1] or lambda = 100[um]
         end
         
         function v_t = velocity_t(self)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             
+            const = utils.constants_fundamantal();
+            Q_E = const.('Q_E');
             
-            v_t = sqrt((2.*self.epsilon_e.*e.*(1+self.alpha_gamma.*self.epsilon_e))...
+            v_t = sqrt((2.*self.epsilon_e.*Q_E.*(1+self.alpha_gamma.*self.epsilon_e))...
                 ./(3.*self.me.*(1+4.*self.alpha_gamma.*self.epsilon_e.*(1+self.alpha_gamma.*self.epsilon_e))));%[m/s]
             
            

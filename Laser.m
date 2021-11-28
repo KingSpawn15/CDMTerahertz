@@ -8,6 +8,8 @@ classdef Laser
         pulse_energy
         laser_spot_fwhm
         laser_spot_sigma
+        laser_pulse_time_fwhm
+        laser_pulse_time_sigma
     end
     
     methods
@@ -21,6 +23,12 @@ classdef Laser
                 self.laser_spot_fwhm = laser_parameters.laser_spot_fwhm;
                 self.laser_spot_sigma = self.calculate_sigma(self.laser_spot_fwhm);
             end
+            
+            if isfield(laser_parameters , 'laser_pulse_time_fwhm')
+                self.laser_pulse_time_fwhm = laser_parameters.laser_pulse_time_fwhm;%[s]
+                self.laser_pulse_time_sigma = self.calculate_sigma(laser_parameters.laser_pulse_time_fwhm);%[s]
+            end
+            
         end
        
         function n_exc = excited_carriers(self, alpha, hnew)
