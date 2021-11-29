@@ -37,8 +37,7 @@ material = IndiumArsenide();
 
 % fitting
 interaction_gain_factor = 1e-1;
-% interaction_gain_factor_photodember = 0.5;
-% method = "rectification";
+
 
 
 
