@@ -11,7 +11,7 @@ classdef ChargeDynamics
         
         function interaction_v =  ...
                 interaction_potential_rectification(discretization, material,...
-                laser , electron, subsampling)    
+                laser , electron, numerical_parameters)    
             % Physical constants
             const = utils.constants_fundamantal();
             C = const.('C');
@@ -50,7 +50,7 @@ classdef ChargeDynamics
             % Down sample t to improve run speed
             
             t_c = discretization.t(discretization.t > discretization.t0);
-            t_c_subsampled = t_c(1:subsampling.tc_subsampling:end);
+            t_c_subsampled = t_c(1:numerical_parameters.tc_subsampling:end);
             
             
             % Calculate electric potential
@@ -113,7 +113,7 @@ classdef ChargeDynamics
         
         function interaction_v =  ...
                 interaction_potential_photodember(discretization, material,...
-                laser , subsampling)
+                laser , numerical_parameters)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             
@@ -123,7 +123,7 @@ classdef ChargeDynamics
             Q_E = const.('Q_E');
             
             t_c = discretization.t(discretization.t > discretization.t0);
-            t_c_subsampled = t_c(1:subsampling.tc_subsampling:end);
+            t_c_subsampled = t_c(1:numerical_parameters.tc_subsampling:end);
             
             x0 = discretization.x0;
             y0 = discretization.y0;

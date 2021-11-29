@@ -48,7 +48,7 @@ classdef UTEMElectron < handle
             
         end
         
-        function [w, e_w, t_w] = subsampling(self, sub_sample_factor, energy, deltat)
+        function [w, e_w, t_w] = energy_time_grid(self, sub_sample_factor, energy, deltat)
             
             e_w = energy(1:sub_sample_factor:end);
             t_w = deltat*1e12;%[ps]

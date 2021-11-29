@@ -45,8 +45,8 @@ interaction_gain_factor = 1e-1;
     discretization.energy, discretization.deltat);
 [fwhm_t , fwhm_e] = utils.calculate_marginals(w, e_w, t_w);
 
-for interaction_gain_factor_photodember = [0 , 0.2, 0.5, 1]
-    for method = [ "combination" , "rectification" ]
+for interaction_gain_factor_photodember = [0.8]
+    for method = ["combination"]
         for theta_pol_degree = 0:15:180
             
             laser.theta_pol =  theta_pol_degree.*(pi/180);
@@ -70,7 +70,6 @@ for interaction_gain_factor_photodember = [0 , 0.2, 0.5, 1]
             
             psi_incoherent = EELS.incoherent_convolution(psi_sub, w, t_w, e_w);
             
-            close all;
             figure(4)
             imagesc(e_w,t_w, psi_incoherent)
             xlabel('Energy [eV]')
@@ -80,10 +79,10 @@ for interaction_gain_factor_photodember = [0 , 0.2, 0.5, 1]
             axis square
             drawnow
             
-            str = ['results/','eels_angle=',num2str(theta_pol_degree),'_method=',char(method),...
-                'pd_gain=',num2str(interaction_gain_factor_photodember)];
-            savefig(gcf,strcat(str,'.fig'));
-            exportgraphics(gcf,strcat(str,'.png'),'Resolution',300);
+%             str = ['results/','eels_angle=',num2str(theta_pol_degree),'_method=',char(method),...
+%                 'pd_gain=',num2str(interaction_gain_factor_photodember)];
+%             savefig(gcf,strcat(str,'.fig'));
+%             exportgraphics(gcf,strcat(str,'.png'),'Resolution',300);
         end
     end
 end

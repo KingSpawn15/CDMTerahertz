@@ -7,18 +7,18 @@ classdef EELS
         electron
         discretization
         material
-        subsampling
+        numerical_parameters
     end
     
     methods
-        function self = EELS(electron, laser, discretization , material , subsampling)
+        function self = EELS(electron, laser, discretization , material , numerical_parameters)
             %WAVEFUNCTION Construct an instance of this class
             %   Detailed explanation goes here
             self.laser = laser ;
             self.electron = electron ;
             self.discretization = discretization;
             self.material = material;
-            self.subsampling = subsampling;
+            self.numerical_parameters = numerical_parameters;
         end
         
         function interact_v = interaction_v(self, method, interaction_gain_factor,...
@@ -30,18 +30,18 @@ classdef EELS
                 case "combination"
                     interact_v = ChargeDynamics.interaction_potential_rectification(self.discretization,...
                         self.material,...
-                        self.laser , self.electron, self.subsampling) + ...
+                        self.laser , self.electron, self.numerical_parameters) + ...
                         ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
-                        self.laser , self.subsampling) * interaction_gain_factor_photodember;
+                        self.laser , self.numerical_parameters) * interaction_gain_factor_photodember;
                     
                 case "photodember"
                     interact_v = ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
-                        self.laser , self.subsampling);
+                        self.laser , self.numerical_parameters);
                     
                 case "rectification"
                     interact_v = ChargeDynamics.interaction_potential_rectification(self.discretization,...
                         self.material,...
-                        self.laser , self.electron, self.subsampling);
+                        self.laser , self.electron, self.numerical_parameters);
             end
             
             interact_v = interaction_gain_factor * interact_v;
