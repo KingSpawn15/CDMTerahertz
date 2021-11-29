@@ -7,6 +7,8 @@ const.EPSILON_0  = 8.85e-12; % V/m
 const.C = 299792458;
 const.M_E = 9.1e-31;
 const.Q_E = 1.6022e-19; % coulomb;
+const.MU_0 = 1.25663706212e-6;%[H/m];
+const.ETA_0 = 377;%[Ohm]
 end
 
 

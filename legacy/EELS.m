@@ -5,20 +5,18 @@ classdef EELS
     properties
         laser
         electron
+        sample_parameters
         discretization
-        material
-        subsampling
     end
     
     methods
-        function self = EELS(electron, laser, discretization , material , subsampling)
+        function self = EELS(electron, laser, discretization, sample_parameters)
             %WAVEFUNCTION Construct an instance of this class
             %   Detailed explanation goes here
             self.laser = laser ;
             self.electron = electron ;
+            self.sample_parameters = sample_parameters;
             self.discretization = discretization;
-            self.material = material;
-            self.subsampling = subsampling;
         end
         
         function interact_v = interaction_v(self, method, interaction_gain_factor,...
@@ -27,21 +25,26 @@ classdef EELS
             %   Detailed explanation goes here
             switch method
                 
-                case "combination"
-                    interact_v = ChargeDynamics.interaction_potential_rectification(self.discretization,...
-                        self.material,...
-                        self.laser , self.electron, self.subsampling) + ...
-                        ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
-                        self.laser , self.subsampling) * interaction_gain_factor_photodember;
-                    
-                case "photodember"
-                    interact_v = ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
-                        self.laser , self.subsampling);
-                    
                 case "rectification"
-                    interact_v = ChargeDynamics.interaction_potential_rectification(self.discretization,...
-                        self.material,...
-                        self.laser , self.electron, self.subsampling);
+                    interact_v = ...
+                        CalcElectricPotential_OpticalRectification_wRetPotential(self.laser.pulse_energy,...
+                        self.discretization.t,self.discretization.z,...
+                        self.sample_parameters.x0,self.sample_parameters.y0,...
+                        self.laser.theta_pol,self.electron.electron_velocity);
+                case "photodember"
+                    interact_v = ...
+                        CalcElectricPotential_wXprimeZprimeInt_wRetPotential(self.laser.pulse_energy,...
+                        self.discretization.t,self.discretization.z,...
+                        self.sample_parameters.x0,self.sample_parameters.y0);
+                case "combination"
+                    interact_v = ...
+                        CalcElectricPotential_OpticalRectification_wRetPotential(self.laser.pulse_energy,...
+                        self.discretization.t,self.discretization.z,...
+                        self.sample_parameters.x0,self.sample_parameters.y0,...
+                        self.laser.theta_pol,self.electron.electron_velocity) + ...
+                        CalcElectricPotential_wXprimeZprimeInt_wRetPotential(self.laser.pulse_energy,...
+                        self.discretization.t,self.discretization.z,...
+                        self.sample_parameters.x0,self.sample_parameters.y0) * interaction_gain_factor_photodember;
             end
             
             interact_v = interaction_gain_factor * interact_v;
@@ -131,7 +134,7 @@ classdef EELS
                     
                 end
             end
-            
+                      
             psi = psi_sum;
             psi_incoherent = psi./trapz(e_w,psi,2);
             

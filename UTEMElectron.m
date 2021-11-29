@@ -1,4 +1,4 @@
-classdef UTEMElectron
+classdef UTEMElectron < handle
     %UTEMELECTRON Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -15,17 +15,15 @@ classdef UTEMElectron
     
     methods
         
-        function self = UTEMElectron(electron_total_energy,...
-                electron_total_time_fs, electron_time_coherent_fwhm_fs,...
-                electron_theta, electron_velocity_c)
+        function self = UTEMElectron(utem_parameters)
             %UTEMELECTRON Construct an instance of this class
             %   Detailed explanation goes here
             
-            self.electron_total_energy = electron_total_energy;
-            self.electron_total_time = electron_total_time_fs * 1e-15;
-            self.electron_time_coherent_fwhm = electron_time_coherent_fwhm_fs * 1e-15;
-            self.electron_theta = electron_theta;
-            self.electron_velocity = utils.c2msec(electron_velocity_c);
+            self.electron_total_energy = utem_parameters.electron_total_energy;
+            self.electron_total_time = utem_parameters.electron_total_time_fs * 1e-15;
+            self.electron_time_coherent_fwhm = utem_parameters.electron_time_coherent_fwhm_fs * 1e-15;
+            self.electron_theta = utem_parameters.electron_theta;
+            self.electron_velocity = utils.c2msec(utem_parameters.electron_velocity_c);
             self.electron_time_coherent_sigma = self.parameters_coherent();
             [self.electron_time_incoherent_sigma,...
                 self.electron_energy_incoherent_sigma] = self.parameters_incoherent();
