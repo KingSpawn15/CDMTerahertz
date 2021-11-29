@@ -1,5 +1,5 @@
 classdef EELS
-    %WAVEFUNCTION Summary of this class goes here
+    %EELS Summary of this class goes here
     %   Detailed explanation goes here
     
     properties
