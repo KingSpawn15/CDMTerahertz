@@ -31,8 +31,6 @@ classdef ChargeDynamics
             laser_pulse_time_sigma = laser.laser_pulse_time_sigma;%[s]
             pulse_energy = laser.pulse_energy;
             
-            % Green's function variables (x',y',z') + kernel
-            %             xprime = discretization.xprime;
             yprime = discretization.yprime;%[m]
             zprime = discretization.zprime;%[m]
             
@@ -56,14 +54,14 @@ classdef ChargeDynamics
             
             
             % Calculate electric potential
-            y0Ind = find(yprime>=0,1,'first');
-            mz0Ind = find(zprime>=-z_max,1,'first');
-            pz0Ind = find(zprime>=z_max,1,'first');
+            y0_ind = find(yprime>=0,1,'first');
+            mz0_ind = find(zprime>=-z_max,1,'first');
+            pz0_ind = find(zprime>=z_max,1,'first');
             
-            LaserXZ = exp(-(XPRIME.^2+ZPRIME.^2)./(laser_spot_sigma.^2));
-            LaserXZ = LaserXZ .* (ZPRIME<=z_max) .* (ZPRIME>=-z_max);
+            laser_xz = exp(-(XPRIME.^2+ZPRIME.^2)./(laser_spot_sigma.^2));
+            laser_xz = laser_xz .* (ZPRIME<=z_max) .* (ZPRIME>=-z_max);
             
-            E0Squared = (pulse_energy/laser_pulse_time_fwhm)*2*ETA_0;
+            e0_squared = (pulse_energy/laser_pulse_time_fwhm)*2*ETA_0;
             
             t0 = -discretization.t0;%[s]  %%% WTF is this line
             dt = discretization.dt;
@@ -81,29 +79,24 @@ classdef ChargeDynamics
                 laser_t = exp(-(t_prime-t0).^2./laser_pulse_time_sigma.^2);
                 laser_t(t_prime<0) = 0;
                 
-                rho = (1/sqrt(3)).*d14*E0Squared.*laser_t.*LaserXZ.*exp(-alpha.*YPRIME).*...
+                rho = (1/sqrt(3)).*d14*e0_squared.*laser_t.*laser_xz.*exp(-alpha.*YPRIME).*...
                     ((2*sqrt(2)/laser_spot_sigma^2).*(XPRIME.*sin(2*theta_pol)+ZPRIME.*cos(2*theta_pol)) - alpha);
                 
                 dPhi = (1/(4*pi*EPSILON_0)).*rho.*green_kernel;
                 
-                rho_Y0 = (1/sqrt(3)).*d14*E0Squared.*laser_t.*LaserXZ;
-                rho_mZ0 = -d14*E0Squared.*laser_t.*LaserXZ.*exp(-alpha.*YPRIME).*((2/sqrt(6)).*cos(2*theta_pol));
+                rho_Y0 = (1/sqrt(3)).*d14*e0_squared.*laser_t.*laser_xz;
+                rho_mZ0 = -d14*e0_squared.*laser_t.*laser_xz.*exp(-alpha.*YPRIME).*((2/sqrt(6)).*cos(2*theta_pol));
                 rho_pZ0 = -rho_mZ0;
                 
-                dPhi_Y0 = (1/(4*pi*EPSILON_0)).*rho_Y0(:,y0Ind,:,:).*green_kernel(:,y0Ind,:,:);
-                dPhi_Z0 = (1/(4*pi*EPSILON_0)).*(rho_mZ0(:,:,mz0Ind,:).*green_kernel(:,:,mz0Ind,:) + rho_pZ0(:,:,pz0Ind,:).*green_kernel(:,:,pz0Ind,:));
+                dPhi_Y0 = (1/(4*pi*EPSILON_0)).*rho_Y0(:,y0_ind,:,:).*green_kernel(:,y0_ind,:,:);
+                dPhi_Z0 = (1/(4*pi*EPSILON_0)).*(rho_mZ0(:,:,mz0_ind,:).*green_kernel(:,:,mz0_ind,:) + rho_pZ0(:,:,pz0_ind,:).*green_kernel(:,:,pz0_ind,:));
                 
-                dPzdt = d14*E0Squared.*laser_t.*LaserXZ.*exp(-alpha.*YPRIME).*...
+                dPzdt = d14*e0_squared.*laser_t.*laser_xz.*exp(-alpha.*YPRIME).*...
                     (2/sqrt(6)).*cos(2*theta_pol).*(-2.*(t_prime-t0)./laser_pulse_time_sigma.^2);
                 dPzdt(t_prime<0) = 0;
                 
                 dA = (MU_0/(4*pi)).*dPzdt.*green_kernel;
                 
-                %     V(time_ind,:) = trapz(zprime,trapz(xprime, (trapz(yprime,(dPhi-v.*dA),2) + dPhi_Y0) ,1),3)...
-                %         + trapz(xprime,trapz(yprime,dPhi_Z0,2),1);
-                if (time_ind == 207)
-                    disp("");
-                end
                 interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi-electron_velocity.*dA),2) + dPhi_Y0) ,1),3)...
                     + trapz(d_xprime,trapz(d_yprime,dPhi_Z0,2),1);
             end

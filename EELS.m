@@ -114,10 +114,19 @@ classdef EELS
             
         end
         
-        function psi_incoherent = incoherent_convolution(psi, w, t_w, e_w)
+        function psi_incoherent = incoherent_convolution(psi, w, t_w, e_w ,...
+                w_cut_off_factor)
+            
+            if nargin < 5
+                w_cut_off_factor = 0.01;
+            end
+            
             psi_sum = zeros(size(psi));
             
-            w_cutOff = 0.01*max(w(:));
+            w_cutOff = w_cut_off_factor*max(w(:));
+            
+            % Example dont use such code. It becomes hard to modify
+            % w_cutOff = 0.01*max(w(:));
             
             parfor t_ind = 1:length(t_w)
                 for e_ind = 1:length(e_w)
