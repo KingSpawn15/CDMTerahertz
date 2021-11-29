@@ -1,4 +1,6 @@
-clear all;
+clear vars;
+[status, msg, msgID] = mkdir('results');
+
 laser_parameters.pulse_energy_experiment = 10 * 1e-9;
 laser_parameters.pulse_energy_gain_factor = 0.05;
 laser_parameters.laser_spot_fwhm = 40e-6;
@@ -32,32 +34,30 @@ elec = UTEMElectron(utem_parameters);
 numerical_parameters.tc_subsampling = 30;
 numerical_parameters.subsampling_factor = 60;
 
-% material
-material = IndiumArsenide();
-
 % fitting
 interaction_gain_factor = 1e-1;
-
-
-
 
 [w, e_w, t_w] = elec.energy_time_grid(numerical_parameters.subsampling_factor,...
     discretization.energy, discretization.deltat);
 [fwhm_t , fwhm_e] = utils.calculate_marginals(w, e_w, t_w);
+
+eels_parameters.electron = elec;
+eels_parameters.discretization = discretization;
+eels_parameters.material = IndiumArsenide();
+eels_parameters.numerical_parameters = numerical_parameters;
 
 for interaction_gain_factor_photodember = [0 , 0.2, 0.5, 1]
     for method = [ "combination" , "rectification" ]
         for theta_pol_degree = 0:15:180
             
             laser.theta_pol =  theta_pol_degree.*(pi/180);
-            eels = EELS(elec, laser, discretization , material , numerical_parameters);
+            eels_parameters.laser = laser;
             
-            interact_v = eels.interaction_v(method, interaction_gain_factor,...
+            eels = EELS(eels_parameters);
+            
+            [psi_sub , psi_incoherent] = eels.energy_loss_spectrum(method,...
+                interaction_gain_factor,...
                 interaction_gain_factor_photodember);
-            
-            f_t = eels.calculate_ft(interact_v);
-            psi_coherent = eels.calculate_psi_coherent(f_t);
-            psi_sub = EELS.psi_sub_sampled(numerical_parameters.subsampling_factor, psi_coherent , e_w);
             
             figure(3)
             imagesc(e_w,t_w,psi_sub)
@@ -67,8 +67,6 @@ for interaction_gain_factor_photodember = [0 , 0.2, 0.5, 1]
             colormap jet
             axis square
             drawnow
-            
-            psi_incoherent = EELS.incoherent_convolution(psi_sub, w, t_w, e_w);
             
             close all;
             figure(4)

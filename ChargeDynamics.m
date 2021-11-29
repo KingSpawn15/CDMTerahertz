@@ -71,9 +71,17 @@ classdef ChargeDynamics
             theta_pol = laser.theta_pol;
             electron_velocity = electron.electron_velocity;
             t_r = (1/C)*sqrt((discretization.x0-XPRIME).^2+(discretization.y0-YPRIME).^2+(Z-ZPRIME).^2);
+            
+            disp("Calculating potential rectification ....");
+            begin = '['; last = '] ... Rectification'; arrow = '>';
+            body = '='; empty = ' ';
             parfor time_ind = 1:length(t_c_subsampled)
                 
-                disp(strcat('time_ind', num2str(time_ind), ' out of ', num2str(length(t_c_subsampled))));
+                body_disp = repmat(body , [1,fix(time_ind / length(t_c_subsampled) * 70)]);
+                empty_disp = repmat(empty , [1,70 - fix(time_ind / length(t_c_subsampled) * 70)]);
+                disp([begin, body_disp, arrow, empty_disp , last]);
+%                 disp([num2str(time_ind),'/',num2str(length(t_c_subsampled))]);
+
                 t_prime = t_c_subsampled(time_ind) - t_r;
                 
                 laser_t = exp(-(t_prime-t0).^2./laser_pulse_time_sigma.^2);
@@ -155,9 +163,16 @@ classdef ChargeDynamics
             gamma = material.gamma;
             v_t = material.v_t;
             
+            
+            begin = '['; last = '] ... Photodember'; arrow = '>';
+            body = '='; empty = ' ';
+            disp("Calculating potential photodember ....");
+            
             parfor time_ind = 1:l_tc
                 
-                disp(strcat('time_ind', num2str(time_ind), ' out of ', num2str(l_tc)));
+                body_disp = repmat(body , [1,fix(time_ind / length(t_c_subsampled) * 70)]);
+                empty_disp = repmat(empty , [1,70 - fix(time_ind / length(t_c_subsampled) * 70)]);
+                disp([begin, body_disp, arrow, empty_disp , last]);
                 t_prime = t_c_subsampled(time_ind) - t_r;
                 
                 g = (Q_E*alpha*v_t^2*...

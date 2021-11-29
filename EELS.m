@@ -11,14 +11,31 @@ classdef EELS
     end
     
     methods
-        function self = EELS(electron, laser, discretization , material , numerical_parameters)
+        function self = EELS(eels_parameters)
             %WAVEFUNCTION Construct an instance of this class
             %   Detailed explanation goes here
-            self.laser = laser ;
-            self.electron = electron ;
-            self.discretization = discretization;
-            self.material = material;
-            self.numerical_parameters = numerical_parameters;
+            self.laser = eels_parameters.laser ;
+            self.electron = eels_parameters.electron ;
+            self.discretization = eels_parameters.discretization;
+            self.material = eels_parameters.material;
+            self.numerical_parameters = eels_parameters.numerical_parameters;
+        end
+        
+        function [psi_sub , psi_incoherent] = energy_loss_spectrum(self , method, interaction_gain_factor,...
+                interaction_gain_factor_photodember)
+            
+            [w, e_w, t_w] = self.electron.energy_time_grid(self.numerical_parameters.subsampling_factor,...
+                self.discretization.energy, self.discretization.deltat);
+            
+            interact_v = self.interaction_v(method, interaction_gain_factor,...
+                interaction_gain_factor_photodember);
+            
+            f_t = self.calculate_ft(interact_v);
+            
+            psi_coherent = self.calculate_psi_coherent(f_t);
+            psi_sub = self.psi_sub_sampled(self.numerical_parameters.subsampling_factor, psi_coherent , e_w);
+            psi_incoherent = EELS.incoherent_convolution(psi_sub, w, t_w, e_w);
+            
         end
         
         function interact_v = interaction_v(self, method, interaction_gain_factor,...
