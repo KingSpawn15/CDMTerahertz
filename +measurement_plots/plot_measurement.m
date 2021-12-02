@@ -3,7 +3,7 @@ function plot_measurement(saved_measurement_file_name, measurement_polarization)
 load(saved_measurement_file_name);
 
 % find index closest to polarization angle
-[~, ind] = min( abs( Polarization - measurement_polarization / 2 ) );
+[~, ind] = min( abs( Polarization - measurement_polarization ) );
 
 RepetitionInd = 1;
 
@@ -32,7 +32,7 @@ for PolInd = ind
     box on
     caxis([0 max(dataset(:))])
     colorbar
-    annotation('textbox',[0.2, 0.2, 0.1, 0.1],'String',['\theta = ',num2str(Polarization(PolInd)*2),'^o'],...
+    annotation('textbox',[0.2, 0.2, 0.1, 0.1],'String',['\theta = ',num2str(Polarization(PolInd)),'^o'],...
         'color',[1 1 1],'LineStyle','none','FontSize',18)
     drawnow
   

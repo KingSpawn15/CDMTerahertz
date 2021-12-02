@@ -10,7 +10,7 @@ laser = Laser(laser_parameters);
 
 discretization_params.x0 = 0;
 discretization_params.y0 = -1e-6;
-discretization_params.ddt = 10e-15;   discretization_params.delay_max = 2.5e-12;
+discretization_params.ddt = 10e-15;   discretization_params.delay_max = 1.5e-12;
 discretization_params.fs = 2.4e15;    discretization_params.l = 2.4e4;
 discretization_params.t0 = -0.5e-12;
 discretization_params.xprime_max = round(3 * laser.laser_spot_sigma,5);
@@ -46,9 +46,9 @@ eels_parameters.discretization = discretization;
 eels_parameters.material = IndiumArsenide();
 eels_parameters.numerical_parameters = numerical_parameters;
 
-for interaction_gain_factor_photodember = [0 , 0.2, 0.5, 1]
-    for method = [ "combination" , "rectification" ]
-        for theta_pol_degree = 0:15:180
+for interaction_gain_factor_photodember = [-1 , 0.5, 2]
+    for method = [ "combination"]
+        for theta_pol_degree = 0:5:180
             
             laser.theta_pol =  theta_pol_degree.*(pi/180);
             eels_parameters.laser = laser;
@@ -73,14 +73,20 @@ for interaction_gain_factor_photodember = [0 , 0.2, 0.5, 1]
             imagesc(e_w,t_w, psi_incoherent)
             xlabel('Energy [eV]')
             ylabel('\Deltat [ps]')
+            ylim([-1 , 1.5])
             colorbar
             colormap jet
             axis square
+            ax = gca;
+            ax.FontSize = 18;
+            ax.LineWidth = 1;
+            ax.YTick = -1:0.5:2.5;
+            box on
             drawnow
             
             str = ['results/','eels_angle=',num2str(theta_pol_degree),'_method=',char(method),...
                 'pd_gain=',num2str(interaction_gain_factor_photodember)];
-            savefig(gcf,strcat(str,'.fig'));
+            %             savefig(gcf,strcat(str,'.fig'));
             exportgraphics(gcf,strcat(str,'.png'),'Resolution',300);
         end
     end
