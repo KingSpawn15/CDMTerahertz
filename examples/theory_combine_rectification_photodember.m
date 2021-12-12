@@ -46,9 +46,9 @@ eels_parameters.discretization = discretization;
 eels_parameters.material = IndiumArsenide();
 eels_parameters.numerical_parameters = numerical_parameters;
 
-for interaction_gain_factor_photodember = [-1 , 0.5, 2]
-    for method = [ "combination"]
-        for theta_pol_degree = 0:5:180
+for interaction_gain_factor_photodember = [0]
+    for method = [ "rectification"]
+        for theta_pol_degree = 0:15:180
             
             laser.theta_pol =  theta_pol_degree.*(pi/180);
             eels_parameters.laser = laser;

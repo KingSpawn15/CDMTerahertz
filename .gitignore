@@ -10,3 +10,5 @@ results/*
 *.prj
 resources/*
 !saved_matrices/rectification.mat
+*.mlx
+examples/New Folder/to_delete.m
