@@ -21,14 +21,18 @@ classdef EELS
             self.numerical_parameters = eels_parameters.numerical_parameters;
         end
         
-        function [psi_sub , psi_incoherent] = energy_loss_spectrum(self , method, interaction_gain_factor,...
-                interaction_gain_factor_photodember)
+        function [psi_sub , psi_incoherent] = energy_loss_spectrum(self , params)
+            
             
             [w, e_w, t_w] = self.electron.energy_time_grid(self.numerical_parameters.subsampling_factor,...
                 self.discretization.energy, self.discretization.deltat);
             
-            interact_v = self.interaction_v(method, interaction_gain_factor,...
-                interaction_gain_factor_photodember);
+            if isfield(params,'interact_v')
+                interact_v = params.interact_v;
+            else
+                interact_v = self.interaction_v(params);
+            end
+            
             
             f_t = self.calculate_ft(interact_v);
             
@@ -38,10 +42,14 @@ classdef EELS
             
         end
         
-        function interact_v = interaction_v(self, method, interaction_gain_factor,...
-                interaction_gain_factor_photodember)
+        function interact_v = interaction_v(self, params)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
+            
+            method = params.method;
+            interaction_gain_factor = params.interaction_gain_factor;
+            interaction_gain_factor_photodember = params.interaction_gain_factor_photodember;
+            
             switch method
                 
                 case "combination"
