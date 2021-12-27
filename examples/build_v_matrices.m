@@ -8,13 +8,7 @@ laser = Laser(laser_parameters);
 discretization = Discretization(discretization_params);
 elec = UTEMElectron(utem_parameters);
 
-
-% fitting
-interaction_gain_factor = 1;
-
-% [w, e_w, t_w] = elec.energy_time_grid(numerical_parameters.subsampling_factor,...
-%     discretization.energy, discretization.deltat);
-% [fwhm_t , fwhm_e] = utils.calculate_marginals(w, e_w, t_w);
+interaction_gain_factor_rectification = 1;
 
 eels_parameters.electron = elec;
 eels_parameters.discretization = discretization;
@@ -30,8 +24,8 @@ for interaction_gain_factor_photodember = [0]
             eels = EELS(eels_parameters);
             
             loss_spectrum_parameters.method = method;
-            loss_spectrum_parameters.interaction_gain_factor = ...
-                interaction_gain_factor;
+            loss_spectrum_parameters.interaction_gain_factor_rectificaiton = ...
+                interaction_gain_factor_rectification;
             loss_spectrum_parameters.interaction_gain_factor_photodember =...
                 interaction_gain_factor_photodember;
             
@@ -44,8 +38,8 @@ end
 method = "photodember";
 interaction_gain_factor_photodember = 1;
 loss_spectrum_parameters.method = method;
-loss_spectrum_parameters.interaction_gain_factor = ...
-    interaction_gain_factor;
+loss_spectrum_parameters.interaction_gain_factor_rectification = ...
+    interaction_gain_factor_rectification;
 loss_spectrum_parameters.interaction_gain_factor_photodember =...
     interaction_gain_factor_photodember;
 v_struct.(strcat('photodember')) = ...

@@ -47,7 +47,7 @@ classdef EELS
             %   Detailed explanation goes here
             
             method = params.method;
-            interaction_gain_factor = params.interaction_gain_factor;
+            interaction_gain_factor_rectification = params.interaction_gain_factor_rectification;
             interaction_gain_factor_photodember = params.interaction_gain_factor_photodember;
             
             switch method
@@ -55,21 +55,21 @@ classdef EELS
                 case "combination"
                     interact_v = ChargeDynamics.interaction_potential_rectification(self.discretization,...
                         self.material,...
-                        self.laser , self.electron, self.numerical_parameters) + ...
+                        self.laser , self.electron, self.numerical_parameters) * interaction_gain_factor_rectification + ...
                         ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
                         self.laser , self.numerical_parameters) * interaction_gain_factor_photodember;
                     
                 case "photodember"
                     interact_v = ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
-                        self.laser , self.numerical_parameters);
+                        self.laser , self.numerical_parameters) * interaction_gain_factor_photodember;
                     
                 case "rectification"
                     interact_v = ChargeDynamics.interaction_potential_rectification(self.discretization,...
                         self.material,...
-                        self.laser , self.electron, self.numerical_parameters);
+                        self.laser , self.electron, self.numerical_parameters) * interaction_gain_factor_rectification;
             end
             
-            interact_v = interaction_gain_factor * interact_v;
+           
             interact_v = movmean(movmean(interact_v,3,1),10,2);
             
         end
