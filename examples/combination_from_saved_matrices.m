@@ -23,8 +23,9 @@ eels_parameters.material = IndiumArsenide();
 eels_parameters.numerical_parameters = numerical_parameters;
 
 
-for interaction_gain_factor_rectification = 0.02 : 0.02 : 0.12
-    for interaction_gain_factor_photodember = 0.02 : 0.02 : 0.12
+for interaction_gain_factor_rectification = 0.12
+    for interaction_gain_factor_photodember = 0.059
+        phase = 0.14;
         plot_ind = 1;
         close all;
         figure = tiledlayout(2,6,'Padding', 'none', 'TileSpacing', 'compact');
@@ -40,10 +41,10 @@ for interaction_gain_factor_rectification = 0.02 : 0.02 : 0.12
             loss_spectrum_parameters.interaction_gain_factor_rectification = ...
                 interaction_gain_factor_rectification;
             loss_spectrum_parameters.interaction_gain_factor_photodember =...
-                interaction_gain_factor_photodember;
+                interaction_gain_factor_photodember * exp(1i*phase);
             loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
                 v_struct.(strcat('angle_',num2str(theta_pol_degree))) + ...
-                interaction_gain_factor_photodember * v_struct.(strcat('photodember'));
+                exp(1i*phase) * interaction_gain_factor_photodember * v_struct.(strcat('photodember'));
             
             [psi_sub , psi_incoherent] = eels.energy_loss_spectrum(loss_spectrum_parameters);
             
