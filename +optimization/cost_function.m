@@ -2,39 +2,34 @@ function err = cost_function(x)
 %COST_FUNCTION Summary of this function goes here
 %   Detailed explanation goes here
 
+factor_pd_theory = x(1) * x(3);
+factor_or_theory = x(2);
 
-params.interaction_gain_factor_photodember = x(1);
-params.interaction_gain_factor_rectification = x(2);
-params.theta_pol_degree = 45;
+angle_measurement = 178;
+angle_theory = 45;
 
-[psi_incoherent, e_w, t_w] = optimization.wrapper_polarization(params);
+err1 = optimization.error_function(angle_measurement,...
+    angle_theory, factor_pd_theory, factor_or_theory);
 
+angle_measurement = 134;
+angle_theory = 135;
 
-angle = 0;
-[psi_measurement, e_w_measurement,...
-    t_w_measurement] = measurement_plots.data_measurement(angle);
-
-window_e_min = -2.5;
-window_e_max = 2.5;
-
-window_t_min = -1;
-
-window_t_max = 1;
+err2 = optimization.error_function(angle_measurement,...
+    angle_theory, factor_pd_theory, factor_or_theory);
 
 
+angle_measurement = 164;
+angle_theory = 75;
 
+err3 = optimization.error_function(angle_measurement,...
+    angle_theory, factor_pd_theory, factor_or_theory);
 
-[E_W , T_W] = meshgrid(e_w, t_w);
-[E_W_measurement , T_W_measurement] = meshgrid(e_w_measurement, t_w_measurement);
+angle_measurement = 118;
+angle_theory = 165;
 
-window = (heaviside(E_W - window_e_min) - heaviside(E_W - window_e_max)).* ...
-    (heaviside(T_W - window_t_min) - heaviside(T_W - window_t_max));
+err4 = optimization.error_function(angle_measurement,...
+    angle_theory, factor_pd_theory, factor_or_theory);
 
-psi_theory_sub = interp2(E_W, T_W, window .* psi_incoherent, E_W_measurement, T_W_measurement,...
-    'nearest',0);
-
-err = psi_measurement - psi_theory_sub;
-
-
+err = [err1; err2; err3;err4];
 end
 
