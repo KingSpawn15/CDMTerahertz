@@ -81,7 +81,7 @@ for interaction_gain_factor_rectification = 0.12
         str = ['results/combination/','combination',...
             'pd_gain=',num2str(interaction_gain_factor_photodember),...
             'or_gain=',num2str(interaction_gain_factor_rectification)];
-%         exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
+        exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
         
     end
 end
