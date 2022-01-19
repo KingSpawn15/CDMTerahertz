@@ -1,10 +1,11 @@
 function err = error_function(angle_measurement,...
-    angle_theory, factor_pd_theory, factor_or_theory)
+    angle_theory, factor_pd_theory, factor_or_theory, delay)
 %ERROR_FUNCTION Summary of this function goes here
 %   Detailed explanation goes here
 params.interaction_gain_factor_photodember = factor_pd_theory;
 params.interaction_gain_factor_rectification = factor_or_theory;
 params.theta_pol_degree = angle_theory;
+params.delay = delay;
 [psi_incoherent, e_w, t_w] = optimization.wrapper_polarization(params);
 
 angle = angle_measurement;

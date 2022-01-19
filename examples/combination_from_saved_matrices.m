@@ -3,6 +3,8 @@ clear vars;
 load('saved_matrices/v_struct.mat');
 [status, msg, msgID] = mkdir('results');
 
+% best parameter 1
+% x = [0.0109 0.4259 0] 
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters();
 
@@ -23,9 +25,9 @@ eels_parameters.material = IndiumArsenide();
 eels_parameters.numerical_parameters = numerical_parameters;
 
 
-for interaction_gain_factor_rectification = 0.12
-    for interaction_gain_factor_photodember = 0.059
-        phase = 0.14;
+for interaction_gain_factor_rectification = 0.4259
+    for interaction_gain_factor_photodember = 0.01
+        phase = 0;
         plot_ind = 1;
         close all;
         figure = tiledlayout(2,6,'Padding', 'none', 'TileSpacing', 'compact');
