@@ -1,4 +1,4 @@
-clear vars;
+clear all;
 [status, msg, msgID] = mkdir('results');
 
 [laser_parameters,discretization_params, utem_parameters,...
@@ -17,14 +17,14 @@ eels_parameters.numerical_parameters = numerical_parameters;
 
 for interaction_gain_factor_photodember = [0]
     for method =  "rectification"
-        for theta_pol_degree = 0:15:180
+        for theta_pol_degree = [10 20 40 50 70 80 100 110 130 140 160 170]
             
             laser.theta_pol =  theta_pol_degree.*(pi/180);
             eels_parameters.laser = laser;
             eels = EELS(eels_parameters);
             
             loss_spectrum_parameters.method = method;
-            loss_spectrum_parameters.interaction_gain_factor_rectificaiton = ...
+            loss_spectrum_parameters.interaction_gain_factor_rectification = ...
                 interaction_gain_factor_rectification;
             loss_spectrum_parameters.interaction_gain_factor_photodember =...
                 interaction_gain_factor_photodember;
@@ -45,4 +45,4 @@ loss_spectrum_parameters.interaction_gain_factor_photodember =...
 v_struct.(strcat('photodember')) = ...
                 eels.interaction_v(loss_spectrum_parameters);
             
-save('saved_matrices/v_struct.mat','v_struct');
+save('saved_matrices/v_struct_3.mat','v_struct');

@@ -1,6 +1,6 @@
-clear vars;
+clearvars;
 [~ , ~ , ~] = mkdir('results/combination');
-load('saved_matrices/v_struct.mat');
+load('saved_matrices/v_struct_3.mat');
 [status, msg, msgID] = mkdir('results');
 
 % best parameter 1
@@ -25,14 +25,14 @@ eels_parameters.material = IndiumArsenide();
 eels_parameters.numerical_parameters = numerical_parameters;
 
 
-for interaction_gain_factor_rectification = 0.4259
-    for interaction_gain_factor_photodember = 0.01
+for interaction_gain_factor_rectification = 0.1
+    for interaction_gain_factor_photodember = 0.05
         phase = 0;
         plot_ind = 1;
         close all;
-        figure = tiledlayout(2,6,'Padding', 'none', 'TileSpacing', 'compact');
+        figure = tiledlayout(2,9,'Padding', 'none', 'TileSpacing', 'compact');
         
-        for theta_pol_degree = 15 : 15 : 180
+        for theta_pol_degree = [10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180]
             
             laser.theta_pol =  theta_pol_degree.*(pi/180);
             eels_parameters.laser = laser;
@@ -63,7 +63,7 @@ for interaction_gain_factor_rectification = 0.4259
             ax = gca;
             ax.FontSize = 14;
             ax.LineWidth = 1;
-            if (plot_ind == 1 || plot_ind == 7)
+            if (plot_ind == 1 || plot_ind == 10)
                 ax.YTick = -1:0.5:2.5;
                 ylabel('\Deltat [ps]')
             else
@@ -83,7 +83,7 @@ for interaction_gain_factor_rectification = 0.4259
         str = ['results/combination/','combination',...
             'pd_gain=',num2str(interaction_gain_factor_photodember),...
             'or_gain=',num2str(interaction_gain_factor_rectification)];
-        exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
+%         exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
         
     end
 end

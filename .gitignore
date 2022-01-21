@@ -10,5 +10,6 @@ results/*
 *.prj
 resources/*
 !saved_matrices/rectification.mat
-!saved_matrices/v_struct.mat
+saved_matrices/v_struct_3.mat
 examples/New Folder/to_delete.m
+saved_matrices/v_struct.mat
