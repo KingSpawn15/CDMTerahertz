@@ -2,9 +2,14 @@ function err = cost_function(x)
 %COST_FUNCTION Summary of this function goes here
 %   Detailed explanation goes here
 
-factor_pd_theory = x(1);
-factor_or_theory = x(2);
-delay = x(3);
+% factor_pd_theory = x(1);
+% factor_or_theory = x(2);
+% delay = 100 * x(3);
+
+factor_pd_theory = 0.01;
+factor_or_theory = 0.08;
+delay = 100 * x;
+
 
 angle_measurement = 14;
 angle_theory = 0;

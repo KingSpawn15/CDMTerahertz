@@ -9,7 +9,7 @@ delay = floor(params.delay);
 theta_pol_degree = params.theta_pol_degree;
 
 [~ , ~ , ~] = mkdir('results/combination');
-load('saved_matrices/v_struct.mat');
+load('saved_matrices/v_struct_3.mat');
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = optimization.default_parameters();
 
@@ -36,9 +36,13 @@ loss_spectrum_parameters.interaction_gain_factor_rectification = ...
     interaction_gain_factor_rectification;
 loss_spectrum_parameters.interaction_gain_factor_photodember =...
     interaction_gain_factor_photodember;
+% loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
+%     v_struct.(strcat('angle_',num2str(theta_pol_degree))) + ...
+%     interaction_gain_factor_photodember * circshift(v_struct.(strcat('photodember')),[delay 0]);
+
 loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
     v_struct.(strcat('angle_',num2str(theta_pol_degree))) + ...
-    interaction_gain_factor_photodember * circshift(v_struct.(strcat('photodember')),[delay 0]);
+    interaction_gain_factor_photodember * circshift(v_struct.(strcat('angle_',num2str(theta_pol_degree))),[delay 0]);
 
 [~ , psi_incoherent] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 
