@@ -3,7 +3,10 @@ clear all;
 
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters();
+
 discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
+discretization_params.delay_max = 1.5e-12;
+
 laser = Laser(laser_parameters);
 discretization = Discretization(discretization_params);
 
@@ -46,4 +49,4 @@ loss_spectrum_parameters.interaction_gain_factor_photodember =...
 v_struct.(strcat('photodember')) = ...
                 eels.interaction_v(loss_spectrum_parameters);
             
-save('saved_matrices/v_struct_4.mat','v_struct');
+save('saved_matrices/v_struct_5.mat','v_struct');

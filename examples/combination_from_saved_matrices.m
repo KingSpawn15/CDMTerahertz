@@ -1,12 +1,15 @@
 clearvars;
 [~ , ~ , ~] = mkdir('results/combination');
-load('saved_matrices/v_struct_3.mat');
+load('saved_matrices/v_struct_5.mat');
 [status, msg, msgID] = mkdir('results');
 
 % best parameter 1
-% x = [0.0109 0.4259 0] 
+% x = [0.0109 0.4259 0]
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters();
+
+discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
+discretization_params.delay_max = 1.5e-12;
 
 laser = Laser(laser_parameters);
 discretization = Discretization(discretization_params);
@@ -24,15 +27,15 @@ eels_parameters.discretization = discretization;
 eels_parameters.material = IndiumArsenide();
 eels_parameters.numerical_parameters = numerical_parameters;
 
-
-for interaction_gain_factor_rectification = 0.1
-    for interaction_gain_factor_photodember = 0.05
+delay = -90;
+for interaction_gain_factor_rectification = 0.34
+    for interaction_gain_factor_photodember = 0.08
         phase = 0;
         plot_ind = 1;
         close all;
         figure = tiledlayout(2,9,'Padding', 'none', 'TileSpacing', 'compact');
         
-        for theta_pol_degree = [10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180]
+        for theta_pol_degree = 10:10:180
             
             laser.theta_pol =  theta_pol_degree.*(pi/180);
             eels_parameters.laser = laser;
@@ -44,9 +47,10 @@ for interaction_gain_factor_rectification = 0.1
                 interaction_gain_factor_rectification;
             loss_spectrum_parameters.interaction_gain_factor_photodember =...
                 interaction_gain_factor_photodember * exp(1i*phase);
+            loss_spectrum_parameters.method = 'combination';
             loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
                 v_struct.(strcat('angle_',num2str(theta_pol_degree))) + ...
-                exp(1i*phase) * interaction_gain_factor_photodember * v_struct.(strcat('photodember'));
+                interaction_gain_factor_photodember * circshift(v_struct.(strcat('photodember')),[delay 0]);
             
             [psi_sub , psi_incoherent] = eels.energy_loss_spectrum(loss_spectrum_parameters);
             
@@ -55,7 +59,7 @@ for interaction_gain_factor_rectification = 0.1
             
             ylim([-1 , 1.5])
             
-            if plot_ind == 6 || plot_ind == 12
+            if plot_ind == 9 || plot_ind == 18
                 colorbar;
             end
             colormap jet
@@ -70,7 +74,7 @@ for interaction_gain_factor_rectification = 0.1
                 ax.YTick = [];
             end
             
-            if (plot_ind >= 7)
+            if (plot_ind >= 10)
                 xlabel('Energy [eV]')
             else
                 ax.XTick = [];
@@ -83,7 +87,7 @@ for interaction_gain_factor_rectification = 0.1
         str = ['results/combination/','combination',...
             'pd_gain=',num2str(interaction_gain_factor_photodember),...
             'or_gain=',num2str(interaction_gain_factor_rectification)];
-%         exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
+        %         exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
         
     end
 end

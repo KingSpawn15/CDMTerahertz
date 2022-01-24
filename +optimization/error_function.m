@@ -12,8 +12,8 @@ angle = angle_measurement;
 [psi_measurement, e_w_measurement,...
     t_w_measurement] = measurement_plots.data_measurement(angle);
 
-window_e_min = -2.5;
-window_e_max = 2.5;
+window_e_min = -4;
+window_e_max = 4;
 
 window_t_min = -1;
 
