@@ -3,9 +3,10 @@ clear all;
 
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters();
-
+discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 laser = Laser(laser_parameters);
 discretization = Discretization(discretization_params);
+
 elec = UTEMElectron(utem_parameters);
 
 interaction_gain_factor_rectification = 1;
@@ -17,7 +18,7 @@ eels_parameters.numerical_parameters = numerical_parameters;
 
 for interaction_gain_factor_photodember = [0]
     for method =  "rectification"
-        for theta_pol_degree = [10 20 40 50 70 80 100 110 130 140 160 170]
+        for theta_pol_degree = 0 : 10 : 180
             
             laser.theta_pol =  theta_pol_degree.*(pi/180);
             eels_parameters.laser = laser;
@@ -45,4 +46,4 @@ loss_spectrum_parameters.interaction_gain_factor_photodember =...
 v_struct.(strcat('photodember')) = ...
                 eels.interaction_v(loss_spectrum_parameters);
             
-save('saved_matrices/v_struct_3.mat','v_struct');
+save('saved_matrices/v_struct_4.mat','v_struct');

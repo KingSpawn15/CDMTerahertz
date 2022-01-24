@@ -4,12 +4,12 @@ function [psi_incoherent, e_w, t_w] = wrapper_polarization(params)
 
 interaction_gain_factor_photodember = params.interaction_gain_factor_photodember;
 interaction_gain_factor_rectification = params.interaction_gain_factor_rectification;
-delay = floor(params.delay);
+delay = round(params.delay);
 
 theta_pol_degree = params.theta_pol_degree;
 
 [~ , ~ , ~] = mkdir('results/combination');
-load('saved_matrices/v_struct_3.mat');
+load('saved_matrices/v_struct_4.mat');
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = optimization.default_parameters();
 

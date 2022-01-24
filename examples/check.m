@@ -1,13 +1,13 @@
 clearvars;
 [~ , ~ , ~] = mkdir('results/combination');
-load('saved_matrices/v_struct_3.mat');
+% load('saved_matrices/v_struct_3.mat');
 [status, msg, msgID] = mkdir('results');
 
 % best parameter 1
 % x = [0.0109 0.4259 0]
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters();
-
+discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 
 
 laser = Laser(laser_parameters);
@@ -27,7 +27,7 @@ eels_parameters.material = IndiumArsenide();
 eels_parameters.numerical_parameters = numerical_parameters;
 
 lst = [[0];[0]];
-for interaction_gain_factor_rectification = [0.2]
+for interaction_gain_factor_rectification = [0.1]
     for interaction_gain_factor_photodember = 0
         phase = 0;
         plot_ind = 1;
@@ -54,10 +54,10 @@ for interaction_gain_factor_rectification = [0.2]
             %                 v_struct.(strcat('angle_',num2str(theta_pol_degree))) + ...
             %                 exp(1i*phase) * interaction_gain_factor_photodember * v_struct.(strcat('photodember'));
             
-            loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
-                v_struct.(strcat('angle_',num2str(theta_pol_degree))) + ...
-                interaction_gain_factor_photodember * circshift(v_struct.(strcat('angle_',num2str(theta_pol_degree))),[delay 0]);
-            
+%             loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
+%                 v_struct.(strcat('angle_',num2str(theta_pol_degree))) + ...
+%                 interaction_gain_factor_photodember * circshift(v_struct.(strcat('angle_',num2str(theta_pol_degree))),[delay 0]);
+%             
             %             loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
             %                 v_struct.(strcat('angle_',num2str(theta_pol_degree)));
             
