@@ -28,10 +28,14 @@ window_t_max = 1;
 window = (heaviside(E_W - window_e_min) - heaviside(E_W - window_e_max)).* ...
     (heaviside(T_W - window_t_min) - heaviside(T_W - window_t_max));
 
+window_measurement = (heaviside(E_W_measurement - window_e_min) - heaviside(E_W_measurement - window_e_max)).* ...
+    (heaviside(T_W_measurement - window_t_min) - heaviside(T_W_measurement - window_t_max));
+
 psi_theory_sub = interp2(E_W, T_W, window .* psi_incoherent, E_W_measurement, T_W_measurement,...
     'nearest',0);
 
-err = psi_measurement - psi_theory_sub;
+psi_measurement_sub = window_measurement .*psi_measurement;
+err = psi_measurement_sub - psi_theory_sub;
 
 
 end

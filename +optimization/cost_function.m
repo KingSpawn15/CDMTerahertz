@@ -3,38 +3,30 @@ function err = cost_function(x , offset)
 %   Detailed explanation goes here
 
 if nargin < 2
-    offset = 32;
+    offset = 60;
 end
 
 factor_pd_theory = x(1);
 factor_or_theory = x(2);
 delay = x(3);
 
-angle_measurement = offset + 0;
-angle_theory = 0;
+list_angle_theory = [0, 90, 30 , 120, 60, 150];
+list_angle_measurement = fix(list_angle_theory / 2);
 
-err1 = optimization.error_function(angle_measurement,...
-    angle_theory, factor_pd_theory, factor_or_theory , delay);
+lst = [list_angle_theory;list_angle_measurement];
 
-angle_measurement = offset + 20/2;
-angle_theory = 20;
+err = [];
 
-err2 = optimization.error_function(angle_measurement,...
-    angle_theory, factor_pd_theory, factor_or_theory , delay);
-
-
-angle_measurement = offset + 40 / 2;
-angle_theory = 40;
-
-err3 = optimization.error_function(angle_measurement,...
-    angle_theory, factor_pd_theory, factor_or_theory, delay);
-
-angle_measurement = offset + 60 / 2;
-angle_theory = 60;
-
-err4 = optimization.error_function(angle_measurement,...
-    angle_theory, factor_pd_theory, factor_or_theory, delay);
-
-err = [err1; err2; err3;err4];
+for angle = lst
+    
+    angle_theory = angle(1);
+    angle_measurement = offset + angle(2);
+    
+    err_i = optimization.error_function(angle_measurement,...
+        angle_theory, factor_pd_theory, factor_or_theory , delay);
+    
+    err = vertcat(err, err_i);
+    
+end
 end
 
