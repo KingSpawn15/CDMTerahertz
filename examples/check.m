@@ -1,5 +1,5 @@
 clearvars;
-[~ , ~ , ~] = mkdir('results/combination/dc/');
+[~ , ~ , ~] = mkdir('results/combination/delay/');
 load('saved_matrices/v_struct_5.mat');
 [status, msg, msgID] = mkdir('results');
 
@@ -11,9 +11,17 @@ load('saved_matrices/v_struct_5.mat');
 discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 discretization_params.delay_max = 1.5e-12;
 
-utem_parameters.electron_total_time_fs = 300;
-utem_parameters.electron_time_coherent_fwhm_fs = 40;
-utem_parameters.electron_theta = -10*pi/180;
+% utem_parameters.electron_total_energy = 1.3;
+% utem_parameters.electron_total_time_fs = 250;
+% utem_parameters.electron_time_coherent_fwhm_fs = 20;
+% utem_parameters.electron_theta = -10*pi/180;
+% 
+
+utem_parameters.electron_total_energy = 1.1;
+utem_parameters.electron_total_time_fs = 360;
+utem_parameters.electron_time_coherent_fwhm_fs = 50;
+utem_parameters.electron_theta = -7*pi/180;
+
 
 % utem_parameters.electron_total_energy = 0.8;
 % utem_parameters.electron_total_time_fs = 150;
@@ -35,24 +43,25 @@ eels_parameters.discretization = discretization;
 eels_parameters.material = IndiumArsenide();
 eels_parameters.numerical_parameters = numerical_parameters;
 
-% load('+optimization/last_optimal_xarr.mat','xarr');
-% factor_pd = xarr(3).x(1);
-% factor_or = xarr(3).x(2);
-% delay = xarr(3).x(3);
-%
-% factor_pd = -.17;
-% factor_or = .07;
-% delay = 10;
+% load('results/optimization/optimization_results.mat','optimization_combined');
+% k = 7;
+% x = optimization_combined(k).x;
+% delay = optimization_combined(k).delay;
+% factor_rect = x(2); factor_pd = x(1); 
+
+factor_rect = 0;
+factor_pd = -.12; 
 delay = 0;
-for dc = [-0.01i , 0.1i, 1i]
-    for interaction_gain_factor_rectification = 0.12
-        for interaction_gain_factor_photodember =0.1
+
+    for interaction_gain_factor_rectification = factor_rect
+        for interaction_gain_factor_photodember = factor_pd
             phase = 0;
             plot_ind = 1;
             close all;
             figure = tiledlayout(2,9,'Padding', 'none', 'TileSpacing', 'compact');
             kk = 1;
-            for theta_pol_degree = 10:10:180
+            for theta_pol_degree = 10 : 10 : 180
+                
                 
                 laser.theta_pol =  theta_pol_degree.*(pi/180);
                 eels_parameters.laser = laser;
@@ -64,17 +73,21 @@ for dc = [-0.01i , 0.1i, 1i]
                     interaction_gain_factor_rectification;
                 loss_spectrum_parameters.interaction_gain_factor_photodember =...
                     interaction_gain_factor_photodember * exp(1i*phase);
-                loss_spectrum_parameters.method = 'combination';
+                loss_spectrum_parameters.method = 'photodember';
                 loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
                     v_struct.(strcat('angle_',num2str(theta_pol_degree))) + ...
-                    dc * interaction_gain_factor_photodember * circshift(v_struct.(strcat('photodember')),[delay 0]);
+                    interaction_gain_factor_photodember * circshift(v_struct.(strcat('photodember')),[delay 0]);
+                tic;
                 [psi_sub , psi_incoherent] = eels.energy_loss_spectrum(loss_spectrum_parameters);
-                
+                toc;
                 nexttile;
                 imagesc(e_w,t_w, psi_incoherent);
                 
-                ylim([-1 , 1.5])
-                
+                ylim([-1 , 1.5]);
+
+                xlim([-3,3]);
+                ylim([-0.5,1]);
+      
                 if plot_ind == 9 || plot_ind == 18
                     colorbar;
                 end
@@ -103,15 +116,15 @@ for dc = [-0.01i , 0.1i, 1i]
                 
             end
             set(gcf,'Position',[100,100,1600,400]);
-            str = ['results/combination/dc/','combination_',...
+            str = ['results/combination/delay/','combination_',...
                 'pd_gain=',num2str(interaction_gain_factor_photodember),...
-                'or_gain=',num2str(interaction_gain_factor_rectification),...
-                'dc=',num2str(dc)];
-            exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
+                'or_gain=',num2str(interaction_gain_factor_rectification)
+                ];
+%             exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
             
         end
     end
-end
+
 
 
 
