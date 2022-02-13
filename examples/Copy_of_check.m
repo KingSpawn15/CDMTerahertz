@@ -6,28 +6,9 @@ load('saved_matrices/v_struct_5.mat');
 % best parameter 1
 % x = [0.0109 0.4259 0]
 [laser_parameters,discretization_params, utem_parameters,...
-    numerical_parameters] = default_parameters();
-
-discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
-discretization_params.delay_max = 1.5e-12;
-
-% utem_parameters.electron_total_energy = 1.3;
-% utem_parameters.electron_total_time_fs = 250;
-% utem_parameters.electron_time_coherent_fwhm_fs = 20;
-% utem_parameters.electron_theta = -10*pi/180;
-% 
-
-utem_parameters.electron_total_energy = 1.1;
-utem_parameters.electron_total_time_fs = 360;
-utem_parameters.electron_time_coherent_fwhm_fs = 50;
-utem_parameters.electron_theta = -7*pi/180;
+    numerical_parameters] = default_parameters_2();
 
 
-% utem_parameters.electron_total_energy = 0.8;
-% utem_parameters.electron_total_time_fs = 150;
-% utem_parameters.electron_time_coherent_fwhm_fs = 20;
-% utem_parameters.electron_theta = -5*pi/180;
-% utem_parameters.electron_velocity_c = 0.7;
 
 
 laser = Laser(laser_parameters);
@@ -40,17 +21,13 @@ elec = UTEMElectron(utem_parameters);
 
 eels_parameters.electron = elec;
 eels_parameters.discretization = discretization;
-eels_parameters.material = IndiumArsenide();
+eels_parameters.material = IndiumArsenide_2();
 eels_parameters.numerical_parameters = numerical_parameters;
 
-% load('results/optimization/optimization_results.mat','optimization_combined');
-% k = 7;
-% x = optimization_combined(k).x;
-% delay = optimization_combined(k).delay;
-% factor_rect = x(2); factor_pd = x(1); 
+
 
 factor_rect = 0;
-factor_pd = -.12; 
+factor_pd = 7.1e-02; 
 delay = 0;
 
     for interaction_gain_factor_rectification = factor_rect
@@ -60,7 +37,7 @@ delay = 0;
             close all;
             figure = tiledlayout(2,9,'Padding', 'none', 'TileSpacing', 'compact');
             kk = 1;
-            for theta_pol_degree = 10 : 10 : 180
+            for theta_pol_degree = 0
                 
                 
                 laser.theta_pol =  theta_pol_degree.*(pi/180);
@@ -79,6 +56,7 @@ delay = 0;
 %                     interaction_gain_factor_photodember * circshift(v_struct.(strcat('photodember')),[delay 0]);
                 tic;
                 [psi_sub , psi_incoherent] = eels.energy_loss_spectrum(loss_spectrum_parameters);
+                save('examples/non essential/phi_incohererent_l.mat','psi_incoherent','psi_sub');
                 toc;
                 nexttile;
                 imagesc(e_w,t_w, psi_incoherent);

@@ -1,40 +1,22 @@
-%%
-% addpath('legacy/Photodember/')
 clc; close all; clear all;
 
-debug = true;
-
-InputArgs = [1.4e-00,7.1e-02,1.3e+13,2.7e-01,-8.1e-01];
-ExpInd = 1:12;
-LaserSpotFWHM = 40e-6;
 %%
+InputArgs = [1.4e-02,7.1e-02,1.3e+13,2.7e-01,-8.1e-01];
+
 PulseEnergyGainFactor = InputArgs(1);
 PhiGainFactor = InputArgs(2);
 Gamma = InputArgs(3);
 GammaFactor = InputArgs(4);
 Phase = InputArgs(5);
 
-%% Input arguments
-if debug
-    InputArgs = [1.1,360,50,-7*pi/180,1e-1,1];
-end
+%%
+% Fitted parameters
+ElectronTotalEnergy = 1.1;
+ElectronTotalTime = 3.6e-13;
+LaserSpotFWHM = 40e-6;
 
-ElectronTotalEnergy = InputArgs(1);
-ElectronTotalTime = InputArgs(2)*1e-15;
-ElectronTimeCoherentFWHM = InputArgs(3)*1e-15;
-Theta = InputArgs(4);
-% PhiGainFactor = InputArgs(5);
-% PulseEnergyGainFactor = InputArgs(6);
-
-fprintf('Input arguments:\n\t 1. ElectronTotalEnergy: %.3f [eV]\n\t 2. ElectronTotalTime: %.3f [fs]\n\t 3. ElectronTimeCoherentFWHM: %.3f [fs]\n\t 4. Theta: %.3f [deg]\n\t 5. PhiGainFactor: %.3f\n\t 6. PulseEnergyGainFactor: %.3f\n',InputArgs.*[1 1 1 180/pi 1 1]);
-
-%% Predetermined parameters
-Theta_Pol = 90.*(pi/180);
-
-PulseEnergy = PulseEnergyGainFactor.*1e-10;%[J]
-
-x0 = 0;
-y0 = -1e-6;
+ElectronTimeCoherentFWHM = 50e-15;
+Theta = -7*pi/180;
 
 %% Physical constants
 c = 299792458;%[m/s];
@@ -50,7 +32,8 @@ ElectronTimeCoherentSigma = ElectronTimeCoherentFWHM./(2*sqrt(2*log(2)));%[s]
 ElectronTimeIncoherentSigma = ElectronTotalTime/(2*sqrt(2*log(2)));%[s]    
 ElectronEnergyIncoherentSigma = ElectronTotalEnergy/(2*sqrt(2*log(2)));%[eV]
 
-v = 0.7*c;% Electron velocity [m/s]
+%
+v = 0.7*c;%[m/s]
 C1 = (-1./(1i*hbar*v))*e;
 
 %% Time variable
@@ -66,34 +49,29 @@ energy = omega.*hbar/e;%[eV]
 ddt = 10e-15;
 deltat = -2.5e-12:ddt:2.5e-12;
 
-%% z variable
-z = (-1:2e-2:1)*1e-4;%[m]
-deltaz = z(2)-z(1);
-
 %% Incoherent broadening weighting function W(E,t)
 SubSampleFactor = 60;
-eW = energy(1:SubSampleFactor:end);
+eW = energy(1:SubSampleFactor:end);%[eV]
 tW = deltat*1e12;%[ps]
 
-SigmaT = ElectronTimeIncoherentSigma*1e12;
-SigmaE = ElectronEnergyIncoherentSigma;
+SigmaX = ElectronTimeIncoherentSigma*1e12;
+SigmaY = ElectronEnergyIncoherentSigma;
 
-a = cos(Theta)^2/(2*SigmaT^2) + sin(Theta)^2/(2*SigmaE^2);
-b = (sin(2*Theta)/4)*((1/SigmaE^2)-(1/SigmaT^2));
-c = sin(Theta)^2/(2*SigmaT^2) + cos(Theta)^2/(2*SigmaE^2);
+a = cos(Theta)^2/(2*SigmaX^2) + sin(Theta)^2/(2*SigmaY^2);
+b = (sin(2*Theta)/4)*((1/SigmaY^2)-(1/SigmaX^2));
+c = sin(Theta)^2/(2*SigmaX^2) + cos(Theta)^2/(2*SigmaY^2);
 
-[TW,EW] = meshgrid(tW,eW);
-W = exp(-(a*TW.^2 + 2*b*TW.*EW + c*EW.^2));
+[X,Y] = meshgrid(tW,eW);
+W = exp(-(a*X.^2 + 2*b*X.*Y + c*Y.^2));
 W = W';
 
-figure(1)
+figure(10)
 imagesc(eW,tW,W)
 xlabel('Energy [eV]')
 ylabel('Time [ps]')
 axis square
 drawnow
 
-%% Calculate the marginals of W
 ProjT = trapz(eW,W,2);
 ProjE = trapz(tW,W,1);
 
@@ -109,25 +87,28 @@ FWHM_E = eW(e2) - eW(e1);
 
 fprintf('Projected energy FWHM: %.3f [eV]\nProjected time FWHM: %.3f [ps]\n',FWHM_E,FWHM_T);
 
+%% z variable
+z = (-1:2e-2:1)*1e-4;%[m]
+deltaz = z(2)-z(1);
+
+[Omega,Z] = meshgrid(omega,z);
+
+%% Scan parameters
+PulseEnergy = PulseEnergyGainFactor.*10.000.*1e-9;%[J]
+
+x0 = 0;
+y0 = -1e-6;
+
 %% Calculate electric potential
-% Here you can choose which potential to calculate (or use both and sum)
-% Phi_OR - Optical Rectificatio
-% Phi_PD - Photo-Dember
-
-% Phi_OR = CalcElectricPotential_OpticalRectification_wRetPotential(PulseEnergy,t,z,x0,y0,Theta_Pol,v);
-% Phi_PD = CalcElectricPotential_wXprimeZprimeInt_wRetPotential(PulseEnergy,t,z,x0,y0);
-
 
 Phi = CalcElectricPotential_wXprimeZprimeInt_wRetPotential_womega_xy(PulseEnergy,t,z,x0,y0,Gamma,GammaFactor,LaserSpotFWHM,Phase);
-
-%%
-% Phi = Phi_OR.*PhiGainFactor;
 Phi = Phi.*PhiGainFactor;
+
 
 
 Phi = movmean(movmean(Phi,3,1),10,2);
 
-figure(2)
+figure(20)
 imagesc(t,z,Phi)
 xlabel('t [s]')
 ylabel('z [m]')
@@ -138,8 +119,6 @@ PhiFFT = fftshift(fft(Phi,length(t),2),2);
 PhiFFT = PhiFFT./max(omega);
 
 %% beta(omega)
-[Omega,Z] = meshgrid(omega,z);
-
 PhiZ = PhiFFT.*exp(-1i*Omega.*Z/v);
 beta = sum(PhiZ,1).*deltaz;
 
@@ -161,27 +140,29 @@ PsiCoherent = fftshift(fft(PsiCoherent,length(t),2),2);
 PsiCoherent = (abs(PsiCoherent)).^2;
 PsiCoherent = PsiCoherent./trapz(energy,PsiCoherent,2);
 
-params_k.PulseEnergy = PulseEnergy;
-params_k.Gamma = Gamma;
-params_k.GammaFactor = GammaFactor;
-params_k.LaserSpotFWHM = LaserSpotFWHM;
-params_k.Phase = Phase;
-params_k.Phi = Phi;
-params_k.PsiCoherent = PsiCoherent;
-save('params_k.mat','params_k');
+params_m.PulseEnergy = PulseEnergy;
+params_m.Gamma = Gamma;
+params_m.GammaFactor = GammaFactor;
+params_m.LaserSpotFWHM = LaserSpotFWHM;
+params_m.Phase = Phase;
+params_m.Phi = Phi;
+params_m.PsiCoherent = PsiCoherent;
 
-%% Sub-sample the model time scan and normalize
-TimeScan_Model = PsiCoherent(:,1:SubSampleFactor:end);
-TimeScan_Model = TimeScan_Model./trapz(eW,TimeScan_Model,2);
+save('params_m.mat','params_m');
 
-figure(3)
-imagesc(eW,tW,TimeScan_Model)
+figure(30)
+imagesc(energy,deltat.*1e12,PsiCoherent)
+title('|\psi_{Coherent}(E)|^2','FontWeight','Normal')
 xlabel('Energy [eV]')
 ylabel('\Deltat [ps]')
 colorbar
 colormap jet
 axis square
 drawnow
+
+%% Sub-sample the model time scan and normalize
+TimeScan_Model = PsiCoherent(:,1:SubSampleFactor:end);
+TimeScan_Model = TimeScan_Model./trapz(eW,TimeScan_Model,2);
 
 %% Incoherent convolution
 TimeScan_Model_Sum = zeros(size(TimeScan_Model));
@@ -201,21 +182,13 @@ parfor tInd = 1:length(tW)
     end
 end
 
-%%
-TimeScan_Model = TimeScan_Model_Sum;
-TimeScan_Model = TimeScan_Model./trapz(eW,TimeScan_Model,2);
-TimeScan_Model = TimeScan_Model./max(TimeScan_Model(:)); %%ADDED
-%% Plot final model output TimeScan(E,deltat)
-figure(4)
-imagesc(eW,tW,TimeScan_Model)
-xlabel('Energy [eV]')
-ylabel('\Deltat [ps]')
-colorbar
-colormap jet
-axis square
-drawnow
+TimeScan_Model_HR = TimeScan_Model_Sum;
+TimeScan_Model_HR = TimeScan_Model_HR./trapz(eW,TimeScan_Model_HR,2);
+TimeScan_Model_HR = TimeScan_Model_HR./max(TimeScan_Model_HR(:));
 
-imagesc(eW,tW,TimeScan_Model)
+%% Plot
+figure(40)
+imagesc(eW,tW,TimeScan_Model_HR)
 title('\psi_{Model}','FontWeight','Normal')
 xlabel('Energy [eV]')
 ylabel('\Deltat [ps]')
@@ -231,5 +204,6 @@ ax.LineWidth = 2;
 ax.FontSize = 18;
 ax.XTick = -3:1.5:3;
 ax.YTick = -0.5:0.5:1;
-phi_incoherent_k = TimeScan_Model;
-save('phi_incoherent_k','phi_incoherent_k');
+
+phi_incoherent_m = TimeScan_Model_HR;
+save('phi_incoherent_m','phi_incoherent_m');

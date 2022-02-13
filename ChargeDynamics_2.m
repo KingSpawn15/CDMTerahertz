@@ -1,4 +1,4 @@
-classdef ChargeDynamics
+classdef ChargeDynamics_2
     %CDEM Summary of this class goes here
     %   Detailed explanation goes here
     

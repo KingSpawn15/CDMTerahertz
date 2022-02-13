@@ -60,7 +60,7 @@ classdef EELS
                         self.laser , self.numerical_parameters) * interaction_gain_factor_photodember;
                     
                 case "photodember"
-                    interact_v = ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
+                    interact_v = ChargeDynamics_2.interaction_potential_photodember(self.discretization, self.material,...
                         self.laser , self.numerical_parameters) * interaction_gain_factor_photodember;
                     
                 case "rectification"
@@ -168,7 +168,7 @@ classdef EELS
             
             psi = psi_sum;
             psi_incoherent = psi./trapz(e_w,psi,2);
-            
+            psi_incoherent = psi_incoherent./max(psi_incoherent(:)); %%ADDED
         end
     end
     
