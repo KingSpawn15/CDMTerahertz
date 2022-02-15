@@ -1,17 +1,25 @@
 clearvars;
-[~ , ~ , ~] = mkdir('results/combination/delay/');
+[~ , ~ , ~] = mkdir('results/combination/exhaustive/');
 load('saved_matrices/v_struct_5.mat');
-[status, msg, msgID] = mkdir('results');
+factor_rect = 0.3;
+factor_pd = 0.05; 
+delay = -5;
 
-% best parameter 1
-% x = [0.0109 0.4259 0]
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters_2();
 
+discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
+discretization_params.delay_max = 1.5e-12;
 
+utem_parameters.electron_total_energy = 0.96;
+utem_parameters.electron_total_time_fs = 350;
+utem_parameters.electron_time_coherent_fwhm_fs = 20;
+utem_parameters.electron_theta = -3*pi/180;
+utem_parameters.electron_velocity_c = 0.7;
 
 
 laser = Laser(laser_parameters);
+
 discretization = Discretization(discretization_params);
 elec = UTEMElectron(utem_parameters);
 
@@ -21,23 +29,22 @@ elec = UTEMElectron(utem_parameters);
 
 eels_parameters.electron = elec;
 eels_parameters.discretization = discretization;
-eels_parameters.material = IndiumArsenide_2();
+material_n = IndiumArsenide();
+% material_n.phase = 0;
+% material_n.gamma = 3.51e12;%[s^-1]
+% material_n.gamma_factor = 1;
+eels_parameters.material = material_n;
+
 eels_parameters.numerical_parameters = numerical_parameters;
-
-
-
-factor_rect = 0;
-factor_pd = 7.1e-02; 
-delay = 0;
 
     for interaction_gain_factor_rectification = factor_rect
         for interaction_gain_factor_photodember = factor_pd
-            phase = 0;
+            
             plot_ind = 1;
             close all;
             figure = tiledlayout(2,9,'Padding', 'none', 'TileSpacing', 'compact');
             kk = 1;
-            for theta_pol_degree = 0
+            for theta_pol_degree = 10 : 10 : 180
                 
                 
                 laser.theta_pol =  theta_pol_degree.*(pi/180);
@@ -49,22 +56,19 @@ delay = 0;
                 loss_spectrum_parameters.interaction_gain_factor_rectification = ...
                     interaction_gain_factor_rectification;
                 loss_spectrum_parameters.interaction_gain_factor_photodember =...
-                    interaction_gain_factor_photodember * exp(1i*phase);
-                loss_spectrum_parameters.method = 'photodember';
-%                 loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
-%                     v_struct.(strcat('angle_',num2str(theta_pol_degree))) + ...
-%                     interaction_gain_factor_photodember * circshift(v_struct.(strcat('photodember')),[delay 0]);
-                tic;
+                    interaction_gain_factor_photodember ;
+                loss_spectrum_parameters.method = 'combination';
+                loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
+                    circshift(v_struct.(strcat('angle_',num2str(theta_pol_degree))),[-delay  0]) + ...
+                    interaction_gain_factor_photodember * circshift(v_struct.(strcat('photodember')),[delay 0]);
                 [psi_sub , psi_incoherent] = eels.energy_loss_spectrum(loss_spectrum_parameters);
-                save('examples/non essential/phi_incohererent_l.mat','psi_incoherent','psi_sub');
-                toc;
                 nexttile;
                 imagesc(e_w,t_w, psi_incoherent);
                 
                 ylim([-1 , 1.5]);
 
-                xlim([-3,3]);
-                ylim([-0.5,1]);
+%                 xlim([-3,3]);
+%                 ylim([-0.5,1]);
       
                 if plot_ind == 9 || plot_ind == 18
                     colorbar;
@@ -88,7 +92,6 @@ delay = 0;
                     ax.XTick = [];
                 end
                 
-                
                 box on
                 plot_ind = plot_ind + 1;
                 
@@ -98,7 +101,6 @@ delay = 0;
                 'pd_gain=',num2str(interaction_gain_factor_photodember),...
                 'or_gain=',num2str(interaction_gain_factor_rectification)
                 ];
-%             exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
             
         end
     end

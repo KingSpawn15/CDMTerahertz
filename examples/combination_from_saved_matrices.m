@@ -11,9 +11,12 @@ load('saved_matrices/v_struct_5.mat');
 discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 discretization_params.delay_max = 1.5e-12;
 
-utem_parameters.electron_total_time_fs = 300;
-utem_parameters.electron_time_coherent_fwhm_fs = 40;
-utem_parameters.electron_theta = -10*pi/180;
+utem_parameters.electron_total_energy = 0.96;
+utem_parameters.electron_total_time_fs = 120;
+utem_parameters.electron_time_coherent_fwhm_fs = 20;
+utem_parameters.electron_theta = -3*pi/180;
+utem_parameters.electron_velocity_c = 0.7;
+
 
 % utem_parameters.electron_total_energy = 0.8;
 % utem_parameters.electron_total_time_fs = 150;

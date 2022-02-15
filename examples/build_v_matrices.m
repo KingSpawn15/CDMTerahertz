@@ -2,7 +2,7 @@ clear all;
 [status, msg, msgID] = mkdir('results');
 
 [laser_parameters,discretization_params, utem_parameters,...
-    numerical_parameters] = default_parameters();
+    numerical_parameters] = default_parameters_2();
 
 discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 discretization_params.delay_max = 1.5e-12;

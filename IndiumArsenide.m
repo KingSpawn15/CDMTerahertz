@@ -19,6 +19,8 @@ classdef IndiumArsenide < handle
         v_t
         me0tilda
         d14
+        gamma_factor
+        phase
 
     end
     
@@ -30,7 +32,9 @@ classdef IndiumArsenide < handle
             EPSILON_0 = const.('EPSILON_0');
             M_E = const.('M_E');
             self.kappa = 12.3*EPSILON_0;
-            self.gamma = 3.3e12;%[s^-1]
+            self.gamma = 1.3e13;%[s^-1]
+            self.gamma_factor = 0.27;
+            self.phase = -0.81;
             self.me = 0.022*M_E;%[kg]
             self.mh = 0.6*M_E;%[kg]
             self.lambda = 0.8;%[um]
@@ -81,11 +85,11 @@ classdef IndiumArsenide < handle
             
         end
         
-        function omega_y = calculate_omega_y(self, n_exc, yprime_grid)
+        function omega_y = calculate_omega_y(self, n_exc, yprime_grid, gaussian_laser_spot)
             const = utils.constants_fundamantal();
             Q_E = const.('Q_E');
             
-            omega_y = sqrt( (Q_E^2/self.kappa).*(n_exc.*exp(-self.alpha.*yprime_grid).*...
+            omega_y = sqrt( (Q_E^2/self.kappa).*(n_exc.*gaussian_laser_spot.*exp(-self.alpha.*yprime_grid).*...
                 (1/self.me0tilda+1/self.mh)+self.n_eq/self.m_eq) - (self.gamma/2)^2 );
         end
         

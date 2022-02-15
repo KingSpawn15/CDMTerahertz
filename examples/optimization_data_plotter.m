@@ -2,14 +2,14 @@ clearvars;
 dir = 'results/optimization_results/';
 [~ , ~ , ~] = mkdir(dir);
 load('saved_matrices/v_struct_5.mat');
-load('results/optimization/optimization_results.mat');
+load('results/optimization/results_3/optimization_results.mat');
 
 [status, msg, msgID] = mkdir('results/optimization_plots');
 
 % best parameter 1
 % x = [0.0109 0.4259 0]
 [laser_parameters,discretization_params, utem_parameters,...
-    numerical_parameters] = default_parameters();
+    numerical_parameters] = default_parameters_2();
 
 discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 discretization_params.delay_max = 1.5e-12;
@@ -71,7 +71,7 @@ for ii = 1:nplots
         [psi_sub , psi_incoherent] = eels.energy_loss_spectrum(loss_spectrum_parameters);
         toc;
         nexttile;
-        imagesc(e_w,t_w, psi_incoherent);
+        imagesc(e_w,t_w, psi_sub);
         
         ylim([-1 , 1.5]);
 
@@ -102,7 +102,7 @@ for ii = 1:nplots
         
     end
     set(gcf,'Position',[100,100,1600,400]);
-    str = [dir,'no_',num2str(ii),'_',...
+    str = [dir,'co_no_',num2str(ii),'_',...
         'pd_gain=',num2str(interaction_gain_factor_photodember,'%.2f'),...
         'or_gain=',num2str(interaction_gain_factor_rectification,'%.2f'),...
         'delay=',num2str(delay),...
