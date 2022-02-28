@@ -1,9 +1,9 @@
 clearvars;
 [~ , ~ , ~] = mkdir('results/combination/exhaustive/');
 load('saved_matrices/v_struct_5.mat');
-factor_rect = 0.3;
-factor_pd = 0.05; 
-delay = -5;
+factor_rect = 0.5;
+factor_pd = 0; 
+delay = -15;
 
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters_2();
@@ -11,12 +11,12 @@ delay = -5;
 discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 discretization_params.delay_max = 1.5e-12;
 
-utem_parameters.electron_total_energy = 0.96;
+utem_parameters.electron_total_energy = 0.94;
 utem_parameters.electron_total_time_fs = 350;
 utem_parameters.electron_time_coherent_fwhm_fs = 20;
-utem_parameters.electron_theta = -3*pi/180;
+utem_parameters.electron_theta = -6.35*pi/180;
 utem_parameters.electron_velocity_c = 0.7;
-
+numerical_parameters.subsampling_factor = 20;
 
 laser = Laser(laser_parameters);
 
@@ -59,7 +59,7 @@ eels_parameters.numerical_parameters = numerical_parameters;
                     interaction_gain_factor_photodember ;
                 loss_spectrum_parameters.method = 'combination';
                 loss_spectrum_parameters.interact_v = interaction_gain_factor_rectification * ...
-                    circshift(v_struct.(strcat('angle_',num2str(theta_pol_degree))),[-delay  0]) + ...
+                    circshift(v_struct.(strcat('angle_',num2str(theta_pol_degree))),[0  0]) + ...
                     interaction_gain_factor_photodember * circshift(v_struct.(strcat('photodember')),[delay 0]);
                 [psi_sub , psi_incoherent] = eels.energy_loss_spectrum(loss_spectrum_parameters);
                 nexttile;
@@ -101,7 +101,7 @@ eels_parameters.numerical_parameters = numerical_parameters;
                 'pd_gain=',num2str(interaction_gain_factor_photodember),...
                 'or_gain=',num2str(interaction_gain_factor_rectification)
                 ];
-            
+           exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400); 
         end
     end
 
