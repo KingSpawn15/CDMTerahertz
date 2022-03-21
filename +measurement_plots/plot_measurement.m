@@ -1,4 +1,4 @@
-function plot_measurement(saved_measurement_file_name, measurement_polarization)
+function [EnergyCrop,time,dataset] = plot_measurement(saved_measurement_file_name, measurement_polarization)
 
 load(saved_measurement_file_name);
 
@@ -19,6 +19,7 @@ for PolInd = ind
     
     figure(7)
     imagesc(EnergyCrop,time,dataset')
+    dataset = dataset';
     xlabel('Energy shift [eV]')
     ylabel('Time delay [ps]')
     xlim([min(EnergyCrop) max(EnergyCrop)])
@@ -32,8 +33,18 @@ for PolInd = ind
     box on
     caxis([0 max(dataset(:))])
     colorbar
-    annotation('textbox',[0.2, 0.2, 0.1, 0.1],'String',['\theta = ',num2str(Polarization(PolInd)),'^o'],...
+    
+    annotation('textbox',[0.2, 0.2, 0.1, 0.1],'String',['\Lambda = ',num2str(Polarization(PolInd)),'^o'],...
+        'color',[1 1 1],'LineStyle','none','FontSize',8)
+    
+    offset = 100;
+    lambda = Polarization(PolInd);
+    theta = num2str(mod(fix(2*(-offset + lambda)),360));
+    
+    annotation('textbox',[0.2, 0.8, 0.1, 0.1],'String',['\theta = ',theta,'^o'],...
         'color',[1 1 1],'LineStyle','none','FontSize',18)
+    
+       
     drawnow
   
 end

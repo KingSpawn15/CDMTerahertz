@@ -1,8 +1,8 @@
 clearvars;
-dir = 'results/optimization_results/or_90_2/';
+dir = 'results/optimization_results/or_all_d6/';
 [~ , ~ , ~] = mkdir(dir);
 load('saved_matrices/v_struct_5.mat');
-load('results/optimization/results_or/optimization_results_or_90_2.mat');
+load('results/optimization/results_or_all_angles_d6/optimization_results_or_all_d6.mat');
 
 
 
@@ -48,12 +48,13 @@ for ii = 1:nplots
     interaction_gain_factor_photodember = list_weights_pd(ii);
     interaction_gain_factor_rectification = list_weights_or(ii);
     
+    angle = optimization_combined(ii).angle;
 %     plot_ind = 1;
     close all;
 %     figure = tiledlayout(2,9,'Padding', 'none', 'TileSpacing', 'compact');
     kk = 1;
     
-    for theta_pol_degree = 90
+    for theta_pol_degree = angle
         
         
         elec = UTEMElectron(utem_parameters);
@@ -105,7 +106,7 @@ for ii = 1:nplots
         
     end
 %     set(gcf,'Position',[100,100,1600,400]);
-    str = [dir,'no_',num2str(ii),'_',...
+    str = [dir,'coh_angle_',num2str(angle),'_',...
         'pd_gain=',num2str(interaction_gain_factor_photodember,'%.2f'),...
         'or_gain=',num2str(interaction_gain_factor_rectification,'%.2f'),...
         'delay_pd=',num2str(delay_pd),...

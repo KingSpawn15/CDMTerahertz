@@ -103,7 +103,7 @@ classdef ChargeDynamics
                     (2/sqrt(6)).*cos(2*theta_pol).*(-2.*(t_prime-t0)./laser_pulse_time_sigma.^2);
                 dPzdt(t_prime<0) = 0;
                 
-                dA = (MU_0/(4*pi)).*dPzdt.*green_kernel;
+                dA = 0*(MU_0/(4*pi)).*dPzdt.*green_kernel;
                 
                 interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi-electron_velocity.*dA),2) + dPhi_Y0) ,1),3)...
                     + trapz(d_xprime,trapz(d_yprime,dPhi_Z0,2),1);
