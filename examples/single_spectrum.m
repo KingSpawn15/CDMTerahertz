@@ -4,7 +4,7 @@ for energy_gain_factor = 1
     %     energy_gain_factor = 1;
     dir = 'results/power_checks_or/';
     [~ , ~ , ~] = mkdir(dir);
-%     load('saved_matrices/v_struct_5deg.mat');
+    %     load('saved_matrices/v_struct_5deg.mat');
     factor_rect = 0.3;
     factor_pd = 0;
     delay_pd = 0;
@@ -46,14 +46,18 @@ for energy_gain_factor = 1
 
     eels_parameters.numerical_parameters = numerical_parameters;
 
+    angles = 45 : 45 : 180  ;
+    nrows = 2;
+    ncols = length(angles)/2;
+
     for interaction_gain_factor_rectification = factor_rect
         for interaction_gain_factor_photodember = factor_pd
 
             plot_ind = 1;
             close all;
-            figure = tiledlayout(1,2,'Padding', 'none', 'TileSpacing', 'compact');
+            figure = tiledlayout(nrows,ncols,'Padding', 'none', 'TileSpacing', 'compact');
             kk = 1;
-            for theta_pol_degree = [90 180]
+            for theta_pol_degree = angles
 
 
                 laser.theta_pol =  theta_pol_degree.*(pi/180);
@@ -75,8 +79,8 @@ for energy_gain_factor = 1
 
                 ylim([-1 , 1.5]);
 
-               
-                if 1==1
+
+                if (plot_ind == ncols || plot_ind == ncols * nrows) 
                     colorbar;
                 end
                 colormap jet
@@ -84,16 +88,17 @@ for energy_gain_factor = 1
                 ax = gca;
                 ax.FontSize = 18;
                 ax.LineWidth = 1;
-                %             if (plot_ind == 1 || plot_ind == 10)
-                if 1==1
+
+                if (plot_ind == 1 || plot_ind == ncols + 1)
+                    %                 if 1==1
                     ax.YTick = -1:0.5:1.5;
                     ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
                 else
                     ax.YTick = [];
                 end
 
-                %             if (plot_ind >= 10)
-                if 1==1
+                if (plot_ind > ncols)
+                    %                     if 1==1
                     ax.XTick = -4:2:4;
                     xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
                 else
