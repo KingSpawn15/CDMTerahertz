@@ -89,8 +89,6 @@ classdef ChargeDynamics
                 
                 rho = (1/sqrt(3)).*d14*e0_squared.*laser_t.*laser_xz.*exp(-alpha.*YPRIME).*...
                     ((2*sqrt(2)/laser_spot_sigma^2).*(XPRIME.*sin(2*theta_pol)+ZPRIME.*cos(2*theta_pol)) - alpha);
-
-
                 
                 dPhi = (1/(4*pi*EPSILON_0)).*rho.*green_kernel;
                 
@@ -107,10 +105,8 @@ classdef ChargeDynamics
                 
                 dA = (MU_0/(4*pi)).*dPzdt.*green_kernel;
                 
-%                 interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi-electron_velocity.*dA),2) + dPhi_Y0) ,1),3)...
-%                     + trapz(d_xprime,trapz(d_yprime,dPhi_Z0,2),1);
-
-                interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(-electron_velocity.*dA),2)) ,1),3);
+                interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi-electron_velocity.*dA),2) + dPhi_Y0) ,1),3)...
+                    + trapz(d_xprime,trapz(d_yprime,dPhi_Z0,2),1);
             end
             
             % Return to original t
@@ -174,7 +170,7 @@ classdef ChargeDynamics
             begin = '['; last = '] ... Photodember'; arrow = '>';
             body = '='; empty = ' ';
             disp("Calculating potential photodember ....");
-            omega_y = 0.05 * omega_y;
+            
             
             parfor time_ind = 1:l_tc
                 
