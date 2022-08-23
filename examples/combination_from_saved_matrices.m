@@ -10,6 +10,8 @@ load('saved_matrices/v_struct_5.mat');
 
 discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 discretization_params.delay_max = 1.5e-12;
+discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
+discretization_params.delay_max = 1.5e-12;
 
 utem_parameters.electron_total_energy = 0.96;
 utem_parameters.electron_total_time_fs = 120;

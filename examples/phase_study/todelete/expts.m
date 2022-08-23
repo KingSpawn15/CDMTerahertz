@@ -1,22 +1,18 @@
 clearvars;
 
 %%
-export_dir = 'examples/phase_study/results/pulsemod/';
-[~,~,~]  =  mkdir(export_dir);
+export_dir = 'examples/phase_study/original/';
 base_filename = 'eels_';
-pol_angle = 90;
-export_file_name = strcat(export_dir,base_filename,num2str(pol_angle),'.png');
+pol_angle = 150;
+export_file_name = strcat(export_dir,base_filename,num2str(pol_angle,'.png');
 
 %%
-tic;
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters_2();
 laser = Laser(laser_parameters);
 
 discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 discretization_params.delay_max = 1.5e-12;
-
-utem_parameters.electron_total_energy = 0.84;
 
 discretization = Discretization(discretization_params);
 elec = UTEMElectron(utem_parameters);
@@ -28,17 +24,13 @@ elec = UTEMElectron(utem_parameters);
 eels_parameters.electron = elec;
 eels_parameters.discretization = discretization;
 eels_parameters.numerical_parameters = numerical_parameters;
-
-
-laser_parameters.pulse_energy_experiment = 1e-9;
-
-laser_parameters.laser_pulse_time_fwhm = 1400e-15;
+% laser_parameters.laser_pulse_time_fwhm = 500e-15;
 laser_parameters.theta_pol = pol_angle * pi / 180;
 laser = Laser(laser_parameters);
 eels_parameters.laser = laser;
 eels_parameters.material = IndiumArsenide();
 % eels_parameters.material.phase = 0;
-% eels_parameters.material.gamma_factor = 0.01;
+% eels_parameters.material.gamma_factor = 0.8;
 eels = EELS(eels_parameters);
 
 loss_spectrum_parameters.method = 'photodember';
@@ -52,26 +44,15 @@ loss_spectrum_parameters.interaction_gain_factor_photodember = 0;
 interact_v_or = eels.interaction_v(loss_spectrum_parameters);
 
 interact_v_pd_store = interact_v_pd;
-
-interact_v_or_store = interact_v_or;
-t_w_store = t_w;
 %%
 
-t_w = t_w_store;
+alpha_pd_0 =  0.001;
+alpha_or_0 = 4*exp(1i*pi/180*0);
 
-factor = 0.8;
-alpha_pd_0 =  .07 * factor;
-alpha_or_0 = 9000 * factor;
-
-alpha_pd_0 = alpha_pd_0 * 1.5; alpha_or_0 =  alpha_or_0 * 0.8;
-
-interact_v_pd = circshift(interact_v_pd_store, [0,0]);
-interact_v_or = circshift(interact_v_or_store, [27,0]);
-
+interact_v_pd = circshift(interact_v_pd_store, [5,0]);
 alpha_pd = alpha_pd_0; alpha_or =  0;
-
 loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
-    interact_v_or * alpha_or;   
+    interact_v_or * alpha_or;
 [psi_sub_pd , psi_incoherent_pd] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 
 alpha_pd = 0; alpha_or =  alpha_or_0;
@@ -82,7 +63,7 @@ loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
 alpha_pd = alpha_pd_0; alpha_or =  alpha_or_0;
 loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
     interact_v_or * alpha_or;
-[psi_sub_com , psi_incoherent_com] = eels.energy_loss_spectrum(loss_spectrum_parameters);   
+[psi_sub_com , psi_incoherent_com] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 
 close all;
 tiledlayout('flow');
@@ -95,7 +76,6 @@ ax = gca;
 ax.FontSize = 18;
 ax.LineWidth = 1;
 ax.YTick = -1:0.5:1.5;
-ax.XTick = -4:2:4;
 ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
 xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
 
@@ -108,7 +88,6 @@ ax = gca;
 ax.FontSize = 18;
 ax.LineWidth = 1;
 ax.YTick = -1:0.5:1.5;
-ax.XTick = -4:2:4;
 ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
 xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
 
@@ -120,7 +99,6 @@ axis square
 ax = gca;
 ax.FontSize = 18;
 ax.LineWidth = 1;
-ax.XTick = -4:2:4;
 ax.YTick = -1:0.5:1.5;
 ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
 xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
@@ -134,7 +112,6 @@ ax = gca;
 ax.FontSize = 18;
 ax.LineWidth = 1;
 ax.YTick = -1:0.5:1.5;
-ax.XTick = -4:2:4;
 ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
 xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
 
@@ -147,7 +124,6 @@ ax = gca;
 ax.FontSize = 18;
 ax.LineWidth = 1;
 ax.YTick = -1:0.5:1.5;
-ax.XTick = -4:2:4;
 ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
 xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
 
@@ -160,10 +136,8 @@ ax = gca;
 ax.FontSize = 18;
 ax.LineWidth = 1;
 ax.YTick = -1:0.5:1.5;
-ax.XTick = -4:2:4;
 ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
 xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
 
-set(gcf,'Position',[100, 50, 1350, 450*2]);
-exportgraphics(gcf, export_file_name,'resolution' , 400);
-toc;
+% set(gcf,'Position',[100, 50, 1350, 450*2]);
+% exportgraphics(gcf, export_file_name,'resolution' , 400);
