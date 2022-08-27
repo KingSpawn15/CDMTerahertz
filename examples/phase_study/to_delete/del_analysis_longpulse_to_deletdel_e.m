@@ -1,6 +1,6 @@
 clearvars;
 %%
-user_filename  = 'longpulse_and_pdmod_modifiedpulse';
+user_filename  = 'longpulse_and_pdmod_to_delete';
 dir_saved_matrices = 'examples/phase_study/saved_matrices/';
 export_dir = strcat('examples/phase_study/results/',user_filename,'/');
 [status, msg, msgID] = mkdir(export_dir);
@@ -10,7 +10,7 @@ base_filename = 'eels_';
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters_2();
 
-laser_parameters.pulse_energy_experiment = 1e-9;
+laser_parameters.pulse_energy_experiment = 1e-8;
 discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
 discretization_params.delay_max = 1.5e-12;
 
@@ -23,11 +23,11 @@ params.utem_parameters =  utem_parameters;
 params.numerical_parameters = numerical_parameters;
 
 %%
-build_v_matrices_fn(user_filename, params);
+% build_v_matrices_fn(user_filename, params);
 %%
 
 %%
-load(strcat(dir_saved_matrices, 'v_struct_',user_filename, '.mat'));
+% load(strcat(dir_saved_matrices, 'v_struct_',user_filename, '.mat'));
 %%
 angle_list = [0, 45, 60, 90, 135, 60, 150];
 % angle_list = [90];
@@ -56,8 +56,40 @@ for pangle = angle_list
     eels_parameters.material = IndiumArsenide();
     eels = EELS(eels_parameters);
 
-    interact_v_or = v_struct.(strcat('angle_',num2str(pangle)));
-    interact_v_pd = v_struct.(strcat('photodember'));
+    %     interact_v_or = v_struct.(strcat('angle_',num2str(pangle)));
+    %     interact_v_pd = v_struct.(strcat('photodember'));
+
+    interaction_gain_factor_rectification = 1;
+    interaction_gain_factor_photodember = [0];
+    method =  "rectification";
+%     theta_pol_degree = [[0: 10 : 180],[45,135]]
+
+%     laser.theta_pol =  theta_pol_degree.*(pi/180);
+%     eels_parameters.laser = laser;
+%     eels = EELS(eels_parameters);
+
+    loss_spectrum_parameters.method = method;
+    loss_spectrum_parameters.interaction_gain_factor_rectification = ...
+        interaction_gain_factor_rectification;
+    loss_spectrum_parameters.interaction_gain_factor_photodember =...
+        interaction_gain_factor_photodember;
+
+    interact_v_or = ...
+        eels.interaction_v(loss_spectrum_parameters);
+
+
+    method = "photodember";
+    interaction_gain_factor_photodember = 1;
+    loss_spectrum_parameters.method = method;
+    loss_spectrum_parameters.interaction_gain_factor_rectification = ...
+        interaction_gain_factor_rectification;
+    loss_spectrum_parameters.interaction_gain_factor_photodember =...
+        interaction_gain_factor_photodember;
+   interact_v_pd = ...
+        eels.interaction_v(loss_spectrum_parameters);
+
+
+
     interact_v_pd_store = interact_v_pd;
     interact_v_or_store = interact_v_or;
     t_w_store = t_w;
@@ -65,7 +97,7 @@ for pangle = angle_list
     %%
 
     alpha_pd_0 =  .07;
-    alpha_or_0 = 101;
+    alpha_or_0 = 7;
 
 
 
@@ -173,51 +205,51 @@ for pangle = angle_list
 end
 
 %%
-
-nrows = 2;
-ncol = 10;
-close all;
-figure;
-tiledlayout(2,10,'TileSpacing','compact');
-ii = 1;
-angle_p_list = sort([[10:10:180],[45,135]]);
-
-
-for angle = angle_p_list
-
-
-    interact_v_or = circshift(v_struct.(strcat('angle_',num2str(angle))),[-10,0]);
-    interact_v_pd = v_struct.(strcat('photodember'));
-
-    alpha_pd = alpha_pd_0; alpha_or =  alpha_or_0;
-    loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
-        interact_v_or * alpha_or;
-    [psi_sub_com , psi_incoherent_com] = eels.energy_loss_spectrum(loss_spectrum_parameters);
-
-    nexttile;
-    imagesc(e_w,t_w, psi_incoherent_com);
-    colormap('jet');
-
-    yticks([]);
-    xticks([]);
-    if ii > ncol
-        xlabel('Energy shift [eV]','FontName','Times New Roman');
-        xticks([-4:2:4]);
-    end
-
-    if (ii == 1 || ii ==ncol + 1)
-        ylabel('\Delta t (ps)','FontName','Times New Roman');
-        yticks([-1 : 0.2 : 1.5]);
-    end
-
-    ylim([-1,1.5]);
-    xlim([-5,5]);
-
-    ii = ii + 1;
-
-end
-set(gcf,'Position',[50,250,2000,450]);
-str = [export_dir,...
-    'dely_combined',...
-    ];
-exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
+% 
+% nrows = 2;
+% ncol = 10;
+% close all;
+% figure;
+% tiledlayout(2,10,'TileSpacing','compact');
+% ii = 1;
+% angle_p_list = sort([[10:10:180],[45,135]]);
+% 
+% 
+% for angle = angle_p_list
+% 
+% 
+%     interact_v_or = v_struct.(strcat('angle_',num2str(angle)));
+%     interact_v_pd = v_struct.(strcat('photodember'));
+% 
+%     alpha_pd = alpha_pd_0; alpha_or =  alpha_or_0;
+%     loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
+%         interact_v_or * alpha_or;
+%     [psi_sub_com , psi_incoherent_com] = eels.energy_loss_spectrum(loss_spectrum_parameters);
+% 
+%     nexttile;
+%     imagesc(e_w,t_w, psi_incoherent_com);
+%     colormap('jet');
+% 
+%     yticks([]);
+%     xticks([]);
+%     if ii > ncol
+%         xlabel('Energy shift [eV]','FontName','Times New Roman');
+%         xticks([-4:2:4]);
+%     end
+% 
+%     if (ii == 1 || ii ==ncol + 1)
+%         ylabel('\Delta t (ps)','FontName','Times New Roman');
+%         yticks([-1 : 0.2 : 1.5]);
+%     end
+% 
+%     ylim([-1,1.5]);
+%     xlim([-5,5]);
+% 
+%     ii = ii + 1;
+% 
+% end
+% set(gcf,'Position',[50,250,2000,450]);
+% str = [export_dir,...
+%     'combined',...
+%     ];
+% exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);

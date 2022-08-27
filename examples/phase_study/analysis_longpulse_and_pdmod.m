@@ -70,7 +70,7 @@ for pangle = angle_list
 
 
     interact_v_pd = circshift(interact_v_pd_store, [0,0]);
-    interact_v_or = circshift(interact_v_or_store, [0,0]);
+    interact_v_or = circshift(interact_v_or_store, [-8,0]);
     t_w = t_w_store-0.1;
 
     alpha_pd = alpha_pd_0; alpha_or =  0;
@@ -186,7 +186,11 @@ angle_p_list = sort([[10:10:180],[45,135]]);
 for angle = angle_p_list
 
 
-    interact_v_or = v_struct.(strcat('angle_',num2str(angle)));
+%     interact_v_or = v_struct.(strcat('angle_',num2str(angle)));
+%     interact_v_pd = v_struct.(strcat('photodember'));
+
+    t_w = t_w_store+0.1;
+    interact_v_or = circshift(v_struct.(strcat('angle_',num2str(angle))),[-10,0]);
     interact_v_pd = v_struct.(strcat('photodember'));
 
     alpha_pd = alpha_pd_0; alpha_or =  alpha_or_0;
@@ -195,7 +199,7 @@ for angle = angle_p_list
     [psi_sub_com , psi_incoherent_com] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 
     nexttile;
-    imagesc(e_w,t_w, psi_incoherent_com);
+    imagesc(e_w,t_w, psi_sub_com);
     colormap('jet');
 
     yticks([]);
@@ -207,7 +211,7 @@ for angle = angle_p_list
 
     if (ii == 1 || ii ==ncol + 1)
         ylabel('\Delta t (ps)','FontName','Times New Roman');
-        yticks([-1 : 0.2 : 1.5]);
+        yticks([-1 : 0.2 : 1.5]); 
     end
 
     ylim([-1,1.5]);
@@ -218,6 +222,6 @@ for angle = angle_p_list
 end
 set(gcf,'Position',[50,250,2000,450]);
 str = [export_dir,...
-    'combined',...
+    'combined_coherent_)',...
     ];
 exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
