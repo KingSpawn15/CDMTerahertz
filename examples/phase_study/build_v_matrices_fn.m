@@ -24,10 +24,13 @@ eels_parameters.laser = laser;
 eels_parameters.material = IndiumArsenide();
 eels = EELS(eels_parameters);
 
+% angles = [[0: 10 : 180],[45,135]];
+angles = [0];
+
 interaction_gain_factor_rectification = 1;
 for interaction_gain_factor_photodember = [0]
     for method =  "rectification"
-        for theta_pol_degree = [[0: 10 : 180],[45,135]]
+        for theta_pol_degree = angles
 
             laser.theta_pol =  theta_pol_degree.*(pi/180);
             eels_parameters.laser = laser;
