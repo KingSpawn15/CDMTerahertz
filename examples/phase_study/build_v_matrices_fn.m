@@ -1,4 +1,4 @@
-function build_v_matrices_fn(user_filename,params)
+function build_v_matrices_fn(user_filename,params, angles_in)
 
 %%
 export_dir = 'examples/phase_study/saved_matrices/';
@@ -25,7 +25,12 @@ eels_parameters.material = IndiumArsenide();
 eels = EELS(eels_parameters);
 
 % angles = [[0: 10 : 180],[45,135]];
-angles = [0];
+if nargin < 3
+    angles  = [[0: 10 : 180],[45,135]];
+
+else
+    angles = angles_in;
+end
 
 interaction_gain_factor_rectification = 1;
 for interaction_gain_factor_photodember = [0]

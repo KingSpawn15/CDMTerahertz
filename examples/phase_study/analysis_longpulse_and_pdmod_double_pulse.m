@@ -7,6 +7,9 @@ export_dir = strcat('examples/phase_study/results/',user_filename,'/');
 base_filename = 'eels_';
 
 %%
+
+angle_list = [0, 90];
+
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters_2();
 
@@ -23,14 +26,14 @@ params.utem_parameters =  utem_parameters;
 params.numerical_parameters = numerical_parameters;
 
 %%
-build_v_matrices_fn(user_filename, params);
+build_v_matrices_fn(user_filename, params, angle_list);
 %%
 
 %%
 load(strcat(dir_saved_matrices, 'v_struct_',user_filename, '.mat'));
 %%
 % angle_list = [0, 45, 60, 90, 135, 60, 150];
-angle_list = [0];
+
 for pangle = angle_list
 
 
@@ -65,12 +68,12 @@ for pangle = angle_list
     %%
 
     alpha_pd_0 =  .07;
-    alpha_or_0 = 70;
+    alpha_or_0 = 20;
 
 
 
-    interact_v_pd = circshift(interact_v_pd_store, [0,0]);
-    interact_v_or = circshift(interact_v_or_store, [-8,0]);
+    interact_v_pd = circshift(interact_v_pd_store, [25,0]);
+    interact_v_or = circshift(interact_v_or_store, [-5,0]);
     t_w = t_w_store-0.1;
 
     alpha_pd = alpha_pd_0; alpha_or =  0;
@@ -190,16 +193,16 @@ end
 % %     interact_v_pd = v_struct.(strcat('photodember'));
 % 
 %     t_w = t_w_store+0.1;
-%     interact_v_or = circshift(v_struct.(strcat('angle_',num2str(angle))),[-10,0]);
+%     interact_v_or = circshift(v_struct.(strcat('angle_',num2str(angle))),[15,0]);
 %     interact_v_pd = v_struct.(strcat('photodember'));
 % 
-%     alpha_pd = alpha_pd_0; alpha_or =  alpha_or_0;
+%     alpha_pd = alpha_pd_0 * 1.5; alpha_or =  alpha_or_0;
 %     loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
 %         interact_v_or * alpha_or;
 %     [psi_sub_com , psi_incoherent_com] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 % 
 %     nexttile;
-%     imagesc(e_w,t_w, psi_sub_com);
+%     imagesc(e_w,t_w, psi_incoherent_com);
 %     colormap('jet');
 % 
 %     yticks([]);
@@ -222,6 +225,6 @@ end
 % end
 % set(gcf,'Position',[50,250,2000,450]);
 % str = [export_dir,...
-%     'combined_coherent_)',...
+%     'combined_',...
 %     ];
 % exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);

@@ -86,6 +86,13 @@ classdef ChargeDynamics
                 t_prime = t_c_subsampled(time_ind) - t_r;
 
                 laser_t = exp(-(t_prime-t0).^2./laser_pulse_time_sigma.^2);
+                sigma_side = 2.5 * laser_pulse_time_sigma;
+                amplitude_side = 0.005;
+                t0_side = 8* 0.6 * sigma_side;
+               
+                laser_t = laser_t + ...
+                    1* amplitude_side.*exp(-(t_prime - t0 -t0_side).^2./(sigma_side).^2) + ...
+                     1 * amplitude_side.*exp(-(t_prime - t0 +t0_side).^2./(sigma_side).^2);
                 %                 laser_t = laser_t .* 1./(1 + exp(+(t_prime-t0)));
                 laser_t(t_prime<0) = 0;
 
@@ -100,7 +107,8 @@ classdef ChargeDynamics
                 asymmetry_pulse = 1./(1 + b*(t_prime-t0)./sqrt((t_prime-t0).^2 + laser_pulse_time_fwhm.^2));
                 laser_t_asym_2 = laser_t .^ asymmetry_pulse;
 
-                laser_t_asym = laser_t;
+%                 laser_t_asym_2 = laser_t;
+                laser_t_asym = laser_t_asym_2;
 
 
                 rho = (1/sqrt(3)).*d14*e0_squared.*laser_t_asym.*laser_xz.*exp(-alpha.*YPRIME).*...
@@ -108,17 +116,17 @@ classdef ChargeDynamics
 
 
 
-                dPhi = (1/(4*pi*EPSILON_0)).*rho.*green_kernel;
+                dPhi = .02*(1/(4*pi*EPSILON_0)).*rho.*green_kernel;
 
-                rho_Y0 = (1/sqrt(3)).*d14*e0_squared.*laser_t_asym.*laser_xz;
+                rho_Y0 = 0*(1/sqrt(3)).*d14*e0_squared.*laser_t_asym.*laser_xz;
                 rho_mZ0 = -d14*e0_squared.*laser_t_asym.*laser_xz.*exp(-alpha.*YPRIME).*((2/sqrt(6)).*cos(2*theta_pol));
                 rho_pZ0 = -rho_mZ0;
 
                 dPhi_Y0 = (1/(4*pi*EPSILON_0)).*rho_Y0(:,y0_ind,:,:).*green_kernel(:,y0_ind,:,:);
-                dPhi_Z0 = (1/(4*pi*EPSILON_0)).*(rho_mZ0(:,:,mz0_ind,:).*green_kernel(:,:,mz0_ind,:) + rho_pZ0(:,:,pz0_ind,:).*green_kernel(:,:,pz0_ind,:));
+                dPhi_Z0 = 50*(1/(4*pi*EPSILON_0)).*(rho_mZ0(:,:,mz0_ind,:).*green_kernel(:,:,mz0_ind,:) + rho_pZ0(:,:,pz0_ind,:).*green_kernel(:,:,pz0_ind,:));
                 %
-                dPzdt = d14*e0_squared.*laser_t.*laser_xz.*exp(-alpha.*YPRIME).*...
-                    (2/sqrt(6)).*cos(2*theta_pol).*(-2.*(t_prime-t0)./laser_pulse_time_sigma.^2);
+%                 dPzdt = d14*e0_squared.*laser_t.*laser_xz.*exp(-alpha.*YPRIME).*...
+%                     (2/sqrt(6)).*cos(2*theta_pol).*(-2.*(t_prime-t0)./laser_pulse_time_sigma.^2);
 
                 dPzdt = d14*e0_squared.*laser_t_asym_2.*laser_xz.*exp(-alpha.*YPRIME).*...
                     (2/sqrt(6)).*cos(2*theta_pol).*(-2.*(t_prime-t0)./laser_pulse_time_sigma.^2);
@@ -129,13 +137,13 @@ classdef ChargeDynamics
                 %                     2.*t_prime) + 2.*(t0 - t_prime))./((1 + exp(lp.*(t0 - ...
                 %                     t_prime))).^2.*laser_pulse_time_fwhm.^2));
 
-                dPzdt(t_prime<0) = 0;
+%                 dPzdt(t_prime<0) = 0;
 
-                dA = -1 * (MU_0/(4*pi)).*dPzdt.*green_kernel;
+                dA = 1 * (MU_0/(4*pi)).*dPzdt.*green_kernel;
 
-                %
-                %                     interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi-electron_velocity.*dA),2) + dPhi_Y0) ,1),3)...
-                %                         + trapz(d_xprime,trapz(d_yprime,dPhi_Z0,2),1);
+                
+%                                     interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi-electron_velocity.*dA),2) + dPhi_Y0) ,1),3)...
+%                                         + trapz(d_xprime,trapz(d_yprime,dPhi_Z0,2),1);
 
                 interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(-electron_velocity.*dA),2)) ,1),3);
             end
