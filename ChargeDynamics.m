@@ -86,13 +86,13 @@ classdef ChargeDynamics
                 t_prime = t_c_subsampled(time_ind) - t_r;
 
                 laser_t = exp(-(t_prime-t0).^2./laser_pulse_time_sigma.^2);
-                sigma_side = 2.5 * laser_pulse_time_sigma;
-                amplitude_side = 0.005;
-                t0_side = 8* 0.6 * sigma_side;
-               
-                laser_t = laser_t + ...
-                    1* amplitude_side.*exp(-(t_prime - t0 -t0_side).^2./(sigma_side).^2) + ...
-                     1 * amplitude_side.*exp(-(t_prime - t0 +t0_side).^2./(sigma_side).^2);
+%                 sigma_side = 2.5 * laser_pulse_time_sigma;
+%                 amplitude_side = 0.005;
+%                 t0_side = 8* 0.6 * sigma_side;
+%                
+%                 laser_t = laser_t + ...
+%                     1* amplitude_side.*exp(-(t_prime - t0 -t0_side).^2./(sigma_side).^2) + ...
+%                      .5 * amplitude_side.*exp(-(t_prime - t0 - 2 * t0_side).^2./(sigma_side).^2);
                 %                 laser_t = laser_t .* 1./(1 + exp(+(t_prime-t0)));
                 laser_t(t_prime<0) = 0;
 
@@ -103,7 +103,7 @@ classdef ChargeDynamics
                 %                     t_prime + laser_pulse_time_fwhm*0)));
                 %                 laser_t_asym = laser_t .* asymmetry_pulse;
 
-                b = 0;
+                b = 0.999;
                 asymmetry_pulse = 1./(1 + b*(t_prime-t0)./sqrt((t_prime-t0).^2 + laser_pulse_time_fwhm.^2));
                 laser_t_asym_2 = laser_t .^ asymmetry_pulse;
 

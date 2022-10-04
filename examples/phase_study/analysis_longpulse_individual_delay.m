@@ -1,6 +1,7 @@
 clearvars;
 %%
-user_filename  = 'longpulse_and_pdmod';
+lib_file_name = 'longpulse_and_pdmod';
+user_filename  = 'longpulse_and_pdmod_individual_delay';
 dir_saved_matrices = 'examples/phase_study/saved_matrices/';
 export_dir = strcat('examples/phase_study/results/',user_filename,'/');
 [status, msg, msgID] = mkdir(export_dir);
@@ -23,14 +24,14 @@ params.utem_parameters =  utem_parameters;
 params.numerical_parameters = numerical_parameters;
 
 %%
-% build_v_matrices_fn(user_filename, params);
+% build_v_matrices_fn(lib_file_name, params);
 %%
 
 %%
-load(strcat(dir_saved_matrices, 'v_struct_',user_filename, '.mat'));
+load(strcat(dir_saved_matrices, 'v_struct_',lib_file_name, '.mat'));
 %%
 angle_list = [0, 45, 60, 90, 135, 60, 150];
-angle_list = [90];
+angle_list = [0];
 for pangle = angle_list
 
 
@@ -70,7 +71,7 @@ for pangle = angle_list
 
 
     interact_v_pd = circshift(interact_v_pd_store, [0,0]);
-    interact_v_or = circshift(interact_v_or_store, [-8,0]);
+    interact_v_or = circshift(interact_v_or_store, [0,0]);
     t_w = t_w_store-0.1;
 
     alpha_pd = alpha_pd_0; alpha_or =  0;
@@ -174,6 +175,13 @@ end
 
 %%
 
+delay_0 = -5;
+delay_90 = -10;
+a = (delay_0 + delay_90) /2;
+b = (delay_0 - delay_90) /2;
+
+delay_fn = @(theta) fix(a + b * cos(2 * theta));
+
 nrows = 2;
 ncol = 10;
 close all;
@@ -189,17 +197,18 @@ for angle = angle_p_list
 %     interact_v_or = v_struct.(strcat('angle_',num2str(angle)));
 %     interact_v_pd = v_struct.(strcat('photodember'));
 
+    delay = delay_fn(angle * pi / 180);
     t_w = t_w_store+0.1;
-    interact_v_or = circshift(v_struct.(strcat('angle_',num2str(angle))),[-10,0]);
+    interact_v_or = circshift(v_struct.(strcat('angle_',num2str(angle))),[delay,0]);
     interact_v_pd = v_struct.(strcat('photodember'));
 
-    alpha_pd = alpha_pd_0; alpha_or =  alpha_or_0;
+    alpha_pd = 1.2 * alpha_pd_0; alpha_or =  .99* alpha_or_0;
     loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
         interact_v_or * alpha_or;
     [psi_sub_com , psi_incoherent_com] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 
     nexttile;
-    imagesc(e_w,t_w, psi_sub_com);
+    imagesc(e_w,t_w, psi_incoherent_com);
     colormap('jet');
 
     yticks([]);
@@ -222,6 +231,6 @@ for angle = angle_p_list
 end
 set(gcf,'Position',[50,250,2000,450]);
 str = [export_dir,...
-    'combined_coherent_)',...
+    'combined_incoherent_)',...
     ];
 exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
