@@ -8,13 +8,14 @@ base_filename = 'eels_';
 
 %%
 
-angle_list = [0, 90];
+angle_list = [90];
 
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters_2();
 
 laser_parameters.pulse_energy_experiment = 1e-9;
-discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
+% discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
+discretization_params.l = 1.5e-12 * 2.5  * discretization_params.fs;
 discretization_params.delay_max = 1.5e-12;
 
 utem_parameters.electron_total_energy = 0.94;

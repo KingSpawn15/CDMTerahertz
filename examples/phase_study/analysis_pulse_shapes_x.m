@@ -1,8 +1,8 @@
 clearvars;
 %%
-user_filename  = 'longpulse_and_pdmod';
+user_filename  = 'addedlongpulse_longsigma=5x_weight=0.2_d';
 dir_saved_matrices = 'examples/phase_study/saved_matrices/';
-export_dir = strcat('examples/phase_study/results/',user_filename,'/');
+export_dir = strcat('examples/phase_study/results/pulse_shapes/',user_filename,'/');
 [status, msg, msgID] = mkdir(export_dir);
 base_filename = 'eels_';
 
@@ -11,11 +11,11 @@ base_filename = 'eels_';
     numerical_parameters] = default_parameters_2();
 
 laser_parameters.pulse_energy_experiment = 1e-9;
-discretization_params.l = 1.5e-12 * 2  * discretization_params.fs;
-discretization_params.delay_max = 1.5e-12;
+discretization_params.l = 1.5e-12 * 3  * discretization_params.fs;
+discretization_params.delay_max = 2 * 1.5e-12;
 
 utem_parameters.electron_total_energy = 0.94;
-laser_parameters.laser_pulse_time_fwhm = 500e-15;
+laser_parameters.laser_pulse_time_fwhm = 650e-15;
 
 params.laser_parameters = laser_parameters;
 params.discretization_params = discretization_params;
@@ -30,12 +30,13 @@ params.numerical_parameters = numerical_parameters;
 load(strcat(dir_saved_matrices, 'v_struct_',user_filename, '.mat'));
 %%
 angle_list = [0, 45, 60, 90, 135, 60, 150];
-angle_list = [90];
+angle_list = [0];
+
 for pangle = angle_list
 
 
     pol_angle = pangle;
-    export_file_name = strcat(export_dir,base_filename,num2str(pol_angle),'.png');
+    export_file_name = strcat(export_dir,base_filename,num2str(pol_angle),'_2.png');
 
     %%
 
@@ -65,13 +66,19 @@ for pangle = angle_list
     %%
 
     alpha_pd_0 =  .07;
-    alpha_or_0 = 70;
+    alpha_or_0 = 20 * 1.3 * 1.2;
 
+    interact_v_pd = circshift(interact_v_pd_store, [18,0]);
+    interact_v_or = circshift(interact_v_or_store, [5 ,0]);
 
+%     interact_v_pd = circshift(interact_v_pd_store, [20+8,0]);
+%     interact_v_or = circshift(interact_v_or_store, [-8 +4 ,0]);
+%     t_w = t_w_store-0.2;
 
-    interact_v_pd = circshift(interact_v_pd_store, [0,0]);
-    interact_v_or = circshift(interact_v_or_store, [-8,0]);
-    t_w = t_w_store-0.1;
+t_w = t_w_store-0.2;
+%     interact_v_or = circshift(v_struct.(strcat('angle_',num2str(angle))),[-15,0]);
+%     interact_v_pd = circshift(v_struct.(strcat('photodember')),[18,0]);
+    
 
     alpha_pd = alpha_pd_0; alpha_or =  0;
     loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
@@ -98,7 +105,7 @@ for pangle = angle_list
     ax = gca;
     ax.FontSize = 18;
     ax.LineWidth = 1;
-    ax.YTick = -1:0.5:1.5;
+    ax.YTick = -1:0.2:1.5;
     ax.XTick = -4:2:4;
     ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
     xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
@@ -111,7 +118,7 @@ for pangle = angle_list
     ax = gca;
     ax.FontSize = 18;
     ax.LineWidth = 1;
-    ax.YTick = -1:0.5:1.5;
+    ax.YTick = -1:0.2:1.5;
     ax.XTick = -4:2:4;
     ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
     xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
@@ -124,7 +131,7 @@ for pangle = angle_list
     ax = gca;
     ax.FontSize = 18;
     ax.LineWidth = 1;
-    ax.YTick = -1:0.5:1.5;
+    ax.YTick = -1:0.2:1.5;
     ax.XTick = -4:2:4;
     ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
     xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
@@ -137,7 +144,7 @@ for pangle = angle_list
     ax = gca;
     ax.FontSize = 18;
     ax.LineWidth = 1;
-    ax.YTick = -1:0.5:1.5;
+    ax.YTick = -1:0.2:1.5;
     ax.XTick = -4:2:4;
     ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
     xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
@@ -151,7 +158,7 @@ for pangle = angle_list
     ax.FontSize = 18;
     ax.LineWidth = 1;
     ax.XTick = -4:2:4;
-    ax.YTick = -1:0.5:1.5;
+    ax.YTick = -1:0.2:1.5;
     ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
     xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
 
@@ -163,7 +170,7 @@ for pangle = angle_list
     ax = gca;
     ax.FontSize = 18;
     ax.LineWidth = 1;
-    ax.YTick = -1:0.5:1.5;
+    ax.YTick = -1:0.2:1.5;
     ax.XTick = -4:2:4;
     ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
     xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
@@ -174,6 +181,14 @@ end
 
 %%
 
+delay_0 = -15;
+delay_90 = -15;
+a = (delay_0 + delay_90) /2;
+b = (delay_0 - delay_90) /2;
+
+delay_fn = @(theta) fix(a + b * cos(2 * theta));
+
+for delay_or = 100
 nrows = 2;
 ncol = 10;
 close all;
@@ -186,20 +201,23 @@ angle_p_list = sort([[10:10:180],[45,135]]);
 for angle = angle_p_list
 
 
-%     interact_v_or = v_struct.(strcat('angle_',num2str(angle)));
-%     interact_v_pd = v_struct.(strcat('photodember'));
-
-    t_w = t_w_store+0.1;
-    interact_v_or = circshift(v_struct.(strcat('angle_',num2str(angle))),[-10,0]);
+    interact_v_or = v_struct.(strcat('angle_',num2str(angle)));
     interact_v_pd = v_struct.(strcat('photodember'));
+    delay_in = delay_fn(angle * pi / 180);
 
-    alpha_pd = alpha_pd_0; alpha_or =  alpha_or_0;
+    t_w = t_w_store-0.2;
+    interact_v_or = circshift(v_struct.(strcat('angle_',num2str(angle))),[delay_in,0]);
+    interact_v_pd = circshift(v_struct.(strcat('photodember')),[18,0]);
+    
+
+
+    alpha_pd = alpha_pd_0 ; alpha_or =  alpha_or_0*1;
     loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
         interact_v_or * alpha_or;
     [psi_sub_com , psi_incoherent_com] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 
     nexttile;
-    imagesc(e_w,t_w, psi_sub_com);
+    imagesc(e_w,t_w, psi_incoherent_com);
     colormap('jet');
 
     yticks([]);
@@ -222,6 +240,7 @@ for angle = angle_p_list
 end
 set(gcf,'Position',[50,250,2000,450]);
 str = [export_dir,...
-    'combined_coherent_)',...
+    'combined_incoherent_fixed',num2str(delay_or),'_'...
     ];
-% exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
+exportgraphics(gcf, strcat(str,'.png'),'resolution' , 400);
+end
