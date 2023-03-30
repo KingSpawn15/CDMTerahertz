@@ -1,4 +1,4 @@
-[~,~,~] = mkdir('results/measurement_plots');
+[~,~,~] = mkdir('results/measurement_plots_reconfig');
 for angle = [0:2:180]
     close all
     measurement_plots.plot_measurement('saved_matrices/rectification.mat', angle);

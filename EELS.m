@@ -33,12 +33,18 @@ classdef EELS
                 interact_v = self.interaction_v(params);
             end
             
-            
+            tic;
             f_t = self.calculate_ft(interact_v);
-            
+            toc;
+            tic;
             psi_coherent = self.calculate_psi_coherent(f_t);
+            toc;
+            tic;
             psi_sub = self.psi_sub_sampled(self.numerical_parameters.subsampling_factor, psi_coherent , e_w);
+            toc;
+            tic;
             psi_incoherent = EELS.incoherent_convolution(psi_sub, w, t_w, e_w);
+            toc;            
             
         end
         
