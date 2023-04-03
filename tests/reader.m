@@ -1,5 +1,6 @@
 % aa = squeeze(cell2mat(DataSetCropAll(11 )));
 % the above line is commented out, so it is not used in this code
+load('saved_matrices\PulseEnergy.mat')
 deltat = Time;
 energy = EnergyCrop;
 % assign variables deltat and energy to values of Time and EnergyCrop, respectively
