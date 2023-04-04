@@ -103,6 +103,7 @@ ax.YTick = [];
 
 stretch_factor = .7; % the desired stretching factor
 pos = get(gcf, 'Position'); % get the current position vector of the figure
+pos(2) = pos(2)*0.5
 pos(3) = pos(3) * stretch_factor; % stretch the height by the stretching factor
 pos(4) = pos(4) / stretch_factor;
 set(gcf, 'Position', pos); % set the new position vector of the figure
