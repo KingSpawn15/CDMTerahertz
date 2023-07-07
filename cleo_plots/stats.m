@@ -84,30 +84,32 @@ end
 close all
 figure;
 
-colors = lines(11);
-for i = 1:2:11
-    plot(deltat, com(i,:) + 2 * (i-1), 'color', colors(i,:),'LineWidth',1);
-    plot(deltat, deltat .* 0 + 2 * (i-1), 'color', colors(i,:),'LineStyle','--', ...
-        'LineWidth',.5)
+colors = turbo(10);
+for i = 1:1:10
+    plot(com(i,:) + 2 * (i-1), deltat, 'color', colors(i,:),'LineWidth',1);
+%     plot( deltat .* 0 + 2 * (i-1), deltat, 'color', colors(i,:),'LineStyle','--', ...
+%         'LineWidth',.5)
+set(gca, 'YDir', 'reverse');
     hold on;
 end
 % axis equal;
 % daspect([1 1 1]);
-xlim([-1 , 1.5]);
-% ylim([-5,5])
+ylim([-.5 , 2]);
+xlim([0,22])
 ax = gca;
-ax.FontSize = 16;
-ax.LineWidth = 1;
-ax.XTick = -1:0.5:1.5;
-ax.YTick = [];
+ax.FontSize = 14;
+% ax.LineWidth = 2;
+ax.YTick = -1:0.5:2;
+ax.XTick = [];
 
-stretch_factor = .7; % the desired stretching factor
+stretch_factor = 1.5; % the desired stretching factor
 pos = get(gcf, 'Position'); % get the current position vector of the figure
 pos(2) = pos(2)*0.5
 pos(3) = pos(3) * stretch_factor; % stretch the height by the stretching factor
 pos(4) = pos(4) / stretch_factor;
 set(gcf, 'Position', pos); % set the new position vector of the figure
-
+ylabel('\Delta t [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
+    xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
 % Export figure as PNG with resolution of 300 DPI
 exportgraphics(gcf, 'cleo_plots/aux_figures/power_90degree.png', 'Resolution', 300, 'BackgroundColor', 'none');
 % 
@@ -136,13 +138,13 @@ exportgraphics(gcf, 'cleo_plots/aux_figures/power_90degree.png', 'Resolution', 3
 % ax.LineWidth = 1;
 % ax.XTick = -1:0.5:1.5;
 % ax.YTick = -4:2:4;
-% 
+
 set(gcf,'Renderer','painters')
 % set(gcf, 'Position', get(gcf, 'Position') .* [1 1 7 1]);
 % % set the position of the figure to be wider than its height, with a width-to-height ratio of 5:1
 % 
 % % Export figure as SVG
-% % print(gcf, 'results/power_90degree.svg');
+% print(gcf, 'results/power_90degree.svg');
 % 
 % % Export figure as PNG with resolution of 300 DPI
-% % exportgraphics(gcf, 'results/power_90degree.png', 'Resolution', 300, 'BackgroundColor', 'none');
+exportgraphics(gcf, 'results/power_90degree.png', 'Resolution', 300, 'BackgroundColor', 'none');
