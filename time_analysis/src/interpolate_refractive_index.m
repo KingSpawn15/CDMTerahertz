@@ -5,7 +5,7 @@ function ngopt = interpolate_refractive_index(data, lambda_nm)
     k_data = data.k;
 
     % Perform linear interpolation
-    n_interp = interp1(lambda_data, n_data, lambda_nm, 'linear', 'extrap');
-    k_interp = interp1(lambda_data, k_data, lambda_nm, 'linear', 'extrap');
+    n_interp = interp1(lambda_data, n_data, lambda_nm, 'spline', 'extrap');
+    k_interp = interp1(lambda_data, k_data, lambda_nm, 'spline', 'extrap');
     ngopt = n_interp + 1i * k_interp;
 end

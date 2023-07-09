@@ -3,7 +3,7 @@
 clear all
 
 
-tau = 150e-15;
+tau = 50e-15;
 omega = 2 * pi * 1e12;
 z = 2e-3;
 d = 1e-3;
