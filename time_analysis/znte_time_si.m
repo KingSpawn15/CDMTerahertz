@@ -3,7 +3,7 @@
 clear all
 
 
-tau = 50e-15;
+tau = 150e-15;
 omega = 2 * pi * 1e12;
 z = 2e-3;
 d = 1e-3;
@@ -26,7 +26,7 @@ lambda_arr = [740, 770, 822, 860, 1560]*1e-9;
 [time_ps4, ethz_t4] = electric_field_time(lambda_arr(4), tau, z, d, ngopt, nTHz, nopt, np, omega_max);
 [time_ps5, ethz_t5] = electric_field_time(lambda_arr(5), tau, z, d, ngopt, nTHz, nopt, np, omega_max);
 
-plot_scaling = 0.5;
+plot_scaling = 0.3;
 
 plot(time_ps1, real(ethz_t1)/max(real(ethz_t1))*plot_scaling + 0.5 * 4 , ...
     time_ps2, real(ethz_t2)/max(real(ethz_t1))*plot_scaling+ 0.5 * 3,...
@@ -37,7 +37,7 @@ plot(time_ps1, real(ethz_t1)/max(real(ethz_t1))*plot_scaling + 0.5 * 4 , ...
 xlim([-2,3])
 
 
-figure;
+% figure;
 
 tau_arr = [300, 200, 150, 100, 30]*1e-15;
 % [time_ps1, ethz_t1] = electric_field_time(lambda_arr(3), tau_arr(1), z, d, ngopt, nTHz, nopt, np, omega_max);
@@ -46,15 +46,15 @@ tau_arr = [300, 200, 150, 100, 30]*1e-15;
 % [time_ps4, ethz_t4] = electric_field_time(lambda_arr(3), tau_arr(4), z, d, ngopt, nTHz, nopt, np, omega_max);
 % [time_ps5, ethz_t5] = electric_field_time(lambda_arr(3), tau_arr(5), z, d, ngopt, nTHz, nopt, np, omega_max);
 
-plot_scaling = 0.3;
-
-plot(time_ps1, real(ethz_t1)/max(real(ethz_t1))*plot_scaling + 0.5 * 4 , ...
-    time_ps2, real(ethz_t2)/max(real(ethz_t2))*plot_scaling+ 0.5 * 3,...
-     time_ps3, real(ethz_t3)/max(real(ethz_t3))*plot_scaling+ 0.5 * 2,...
-      time_ps4, real(ethz_t4)/max(real(ethz_t4))*plot_scaling+ 0.5 * 1,...
-       time_ps5, real(ethz_t5)/max(real(ethz_t5))*plot_scaling+ 0.5 * 0,...
-    'LineWidth',2);
-xlim([-1,1.5])
+% plot_scaling = 0.3;
+% 
+% plot(time_ps1, real(ethz_t1)/max(real(ethz_t1))*plot_scaling + 0.5 * 4 , ...
+%     time_ps2, real(ethz_t2)/max(real(ethz_t2))*plot_scaling+ 0.5 * 3,...
+%      time_ps3, real(ethz_t3)/max(real(ethz_t3))*plot_scaling+ 0.5 * 2,...
+%       time_ps4, real(ethz_t4)/max(real(ethz_t4))*plot_scaling+ 0.5 * 1,...
+%        time_ps5, real(ethz_t5)/max(real(ethz_t5))*plot_scaling+ 0.5 * 0,...
+%     'LineWidth',2);
+% xlim([-1,1.5])
 
 hold on;
 % tt = [-2*tau:0.1*tau:5*tau].';
@@ -82,9 +82,9 @@ ethz = real(ethz_t3(time_ps3 < 3 & time_ps3 >-2));
 % set(gca,'Color','red')
 % gca.LineWidth = 2;
 % hold off;
-
-figure
-plot(t0_vec, eels)
+% 
+% figure
+% plot(t0_vec, eels)
 %%
 function [time_ps, ethz_t] = electric_field_time(lambda, tau, z, d, ngopt, nTHz, nopt, np, omega_max)
     

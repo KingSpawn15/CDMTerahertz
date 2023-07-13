@@ -1,18 +1,20 @@
 clear all
 close all
 tau = 150e-15;
-omega =  (0 : 2 * pi * 0.05e12 : 2 * pi * 10e12).';
+omega =  (0 : 2 * pi * 0.05e12 : 2 * pi * 6e12).';
 z = -1e-6;
 d = .5e-3;
 
 close all;
-omega_max = 2 * pi * 3e12;
-np = 10001;
+omega_max = 2 * pi * (3)*1e12;
+np = 501;
 
 materials = opticalresponse;
 
 
-nTHz = @(omega) (materials.nTHz_inas(omega / (2 * pi) ));
+nTHz = @(omega) materials.nTHz_inas(omega / (2 * pi) );
+
+
 refractive_index_data = read_refractive_index('refractive_index_data/InAs.txt');
 nopt = @(lambda) (interpolate_refractive_index(refractive_index_data, lambda * 1e9));
 delta_lambda = 0.1*1e-9;
@@ -29,7 +31,7 @@ lambda_arr = [740, 770, 800, 860, 1560]*1e-9;
 % [time_ps3, ethz_t3] = electric_field_time(lambda_arr(3), tau, z, d, ngopt, nTHz, nopt, np, omega_max);
 % [time_ps4, ethz_t4] = electric_field_time(lambda_arr(4), tau, z, d, ngopt, nTHz, nopt, np, omega_max);
 % [time_ps5, ethz_t5] = electric_field_time(lambda_arr(5), tau, z, d, ngopt, nTHz, nopt, np, omega_max);
-% % 
+% % % 
 % plot_scaling = 0.25;
 % 
 % plot(time_ps1, real(ethz_t1)/max(real(ethz_t1))*plot_scaling + 0.5 * 4 , ...
@@ -43,13 +45,13 @@ lambda_arr = [740, 770, 800, 860, 1560]*1e-9;
 
 % figure;
 % 
-tau_arr = [30, 150, 100, 50, 30]*1e-15;
+tau_arr = [200, 150, 100, 50, 30]*1e-15;
 [time_ps1, ethz_t1] = electric_field_time(lambda_arr(3), tau_arr(1), z, d, ngopt, nTHz, nopt, np, omega_max);
 [time_ps2, ethz_t2] = electric_field_time(lambda_arr(3), tau_arr(2), z, d, ngopt, nTHz, nopt, np, omega_max);
 [time_ps3, ethz_t3] = electric_field_time(lambda_arr(3), tau_arr(3), z, d, ngopt, nTHz, nopt, np, omega_max);
 [time_ps4, ethz_t4] = electric_field_time(lambda_arr(3), tau_arr(4), z, d, ngopt, nTHz, nopt, np, omega_max);
 [time_ps5, ethz_t5] = electric_field_time(lambda_arr(3), tau_arr(5), z, d, ngopt, nTHz, nopt, np, omega_max);
-% 
+
 plot_scaling = 0.3;
 
 plot(time_ps1, real(ethz_t1)/max(real(ethz_t1))*plot_scaling + 0.5 * 4 , ...
@@ -81,7 +83,7 @@ exportgraphics(gcf,'inas_time.png','Resolution',500)
 %%
 % close all
 velec = 0.7 * 3 * 10^(8-12);
-sigma_z = 20 * 1e-6;
+sigma_z = 40 * 1e-6;
 
 ethz_t = ethz_t5;
 tt_t = time_ps5;
@@ -108,7 +110,7 @@ brighten(-.5);
 hold on;
 
 
-c = line((t0_vec), (t0_vec) * 0 + 5*sigma_z, 4-2.5 * eels / max(abs(eels)));
+c = line((t0_vec), (t0_vec) * 0 + 5*sigma_z, 4+2.5 * eels / max(abs(eels)));
 set(c,'Color','blue')
 c.LineWidth = 1;
 
@@ -192,25 +194,28 @@ end
 
 function [time_ps, ethz_t] = electric_field_time(lambda, tau, z, d, ngopt, nTHz, nopt, np, omega_max)
     
-    if nargin < 8
-        omega_max = 2 * pi * 2e12;
-        if nargin < 7
-            np = 1001;
-        end
-    end
+%     if nargin < 8
+%         omega_max = 2 * pi * 2e12;
+%         if nargin < 7
+%             np = 1001;
+%         end
+%     end
 
 
     C = 3e8;
     mu0 = 4 * pi * 1e-7;
-    
-    
+
+
     Ii = @(omega, tau) tau * sqrt(pi) * exp(-(tau^2 * omega.^2)/2);
-    
+
+    %     alpha = @(lambda) 2 * (2 * pi / lambda) * imag(nopt(lambda));
+    alpha = @(lambda) 10 *  (2 * pi / lambda) * imag(nopt(lambda));
     q = @(omega) omega .* nTHz(omega) / C;
-    q0 = @(omega, lambda) omega .* ngopt(lambda) / C;
+%     q0 = @(omega, lambda) real(omega .* ngopt(lambda) / C) + 1i * alpha(lambda) ;
+    q0 = @(omega, lambda) omega .* ngopt(lambda) / C  ;
     qv = @(omega) omega / C;
-    
-    
+
+
     
     S = @(omega, lambda, tau) (1i * mu0 * omega.^2 .* Ii(omega, tau)) ./ (C * nopt(lambda) .* (q(omega) + ...
         q0(omega, lambda)));
@@ -249,7 +254,7 @@ function [time_ps, ethz_t] = electric_field_time(lambda, tau, z, d, ngopt, nTHz,
 %     eomg(isnan(eomg)) = 0;
 %     eomg(omg>2 * pi * 6e12) = 0.72 *  eomg(omg>2 * pi * 6e12);
     plot(omg/(2 * pi), abs(eomg).^2)
-    ethz_omega = [zeros(4 * np, 1); eomg; zeros(2 * np, 1)];
+    ethz_omega = [zeros(8 * np, 1); eomg; zeros(6 * np, 1)];
     ethz_t = ifftshift(fft(fftshift(ethz_omega)));
     [~, max_ind ] =  max((real(ethz_t)));
 
