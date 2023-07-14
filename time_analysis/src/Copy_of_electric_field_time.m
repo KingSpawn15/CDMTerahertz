@@ -11,8 +11,7 @@ function [time_ps, ethz_t] = electric_field_time(lambda, tau, z, d, ngopt, nTHz,
     alpha = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda));
     q = @(omega) omega .* nTHz(omega) / C;
 
-%     q0 = @(omega, lambda) omega .* ngopt(lambda) / C  ;
-    q0 = @(omega, lambda) real(omega .* ngopt(lambda) / C) + 1i * alpha(lambda) ;
+    q0 = @(omega, lambda) omega .* ngopt(lambda) / C  ;
     qv = @(omega) omega / C;
 
 

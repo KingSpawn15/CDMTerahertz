@@ -13,7 +13,7 @@ np = 10001;
 materials = opticalresponse;
 
 
-nTHz = @(omega) materials.nTHz_inas(omega / (2 * pi) );
+nTHz = @(omega) materials.nTHz_inas_drude(omega / (2 * pi) );
 refractive_index_data = read_refractive_index('refractive_index_data/InAs.txt');
 nopt = @(lambda) interpolate_refractive_index(refractive_index_data, lambda * 1e9);
 delta_lambda = 0.1*1e-9;

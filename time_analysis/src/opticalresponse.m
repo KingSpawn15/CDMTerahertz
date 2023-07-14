@@ -51,6 +51,32 @@ classdef opticalresponse
             nTHz = sqrt((289.27 - 6*nu.^2)./(29.16 - nu.^2));
             
         end
+    
+
+        function nTHz = nTHz_inas_drude(nu)
+            
+            omega = 2 * pi * nu;
+            lambda_TO_cm = 217.3;
+            lambda_LO_cm = 238.5;
+            Ccm = 3e10;
+            omega_LO = 2 * pi * Ccm * lambda_LO_cm;
+            omega_TO = 2 * pi * Ccm * lambda_TO_cm;
+            ninf = 3.5;
+
+            eps_inf = ninf^2;
+%             gamma_LO = 2 * pi * Ccm * 2.01;
+%             gamma_TO = 2 * pi * Ccm * 8.67;
+            gamma_LO = 2 * pi * Ccm * 4.01;
+            gamma_TO = 2 * pi * Ccm * 4.01;
+            omega_p = 78.1e12;
+            gammaD = (1/125e-15);
+            background =  eps_inf .* (omega_LO^2 - omega.^2 - 1i * gamma_LO .* omega) ./ ...
+                (omega_TO^2 - omega.^2 - 1i * gamma_TO .* omega);
+
+            drude = -eps_inf .* omega_p^2./(omega.*(omega + 1i*(1/gammaD)));
+            nTHz = sqrt(background + drude);
+        end
+
 
         function nTHz = nTHz_inas(nu)
             
@@ -61,14 +87,10 @@ classdef opticalresponse
             omega_LO = 2 * pi * Ccm * lambda_LO_cm;
             omega_TO = 2 * pi * Ccm * lambda_TO_cm;
             ninf = 3.5;
-%             ninf = 5.5;
+
             eps_inf = ninf^2;
             gamma_LO = 2 * pi * Ccm * 2.01;
             gamma_TO = 2 * pi * Ccm * 8.67;
-%             gamma_LO = 2 * pi * Ccm * 4.01;
-%             gamma_TO = 2 * pi * Ccm * 4.01;
-%             gamma_LO = 2 * pi * Ccm * 0.01;
-%             gamma_TO = 2 * pi * Ccm * 0.01;
 
             nTHz = sqrt(eps_inf .* (omega_LO^2 - omega.^2 + 1i * gamma_LO .* omega) ./ ...
                 (omega_TO^2 - omega.^2 + 1i * gamma_TO .* omega));

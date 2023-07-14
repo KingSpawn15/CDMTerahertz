@@ -9,7 +9,7 @@ eels = [];
 for t0 = t0_vec
 
     zz_l = (-5 : 0.1: 5).' .* sigma_z;
-    tt_l = zz_l / velec + t0;
+    tt_l = zz_l / velec - t0;
     et_l = interp2(T', Z', ET', tt_l, zz_l);
 %     et_l(isnan(et_l)) = 0;
     eels = [eels;trapz(zz_l,et_l)];
