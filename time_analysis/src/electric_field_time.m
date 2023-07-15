@@ -1,4 +1,4 @@
-function [time_ps, ethz_t] = electric_field_time(lambda, tau, z, d, ngopt, nTHz, nopt, np, omega_max)
+function [time_ps, ethz_t, omg, eomg] = electric_field_time(lambda, tau, z, d, ngopt, nTHz, nopt, np, omega_max)
 
 
     C = 3e8;

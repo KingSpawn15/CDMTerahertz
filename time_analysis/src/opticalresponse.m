@@ -73,7 +73,7 @@ classdef opticalresponse
             background =  eps_inf .* (omega_LO^2 - omega.^2 - 1i * gamma_LO .* omega) ./ ...
                 (omega_TO^2 - omega.^2 - 1i * gamma_TO .* omega);
 
-            drude = -eps_inf .* omega_p^2./(omega.*(omega + 1i*(1/gammaD)));
+            drude = - 1 .* omega_p^2./(omega.*(omega + 1i*(1/gammaD)));
             nTHz = sqrt(background + drude);
         end
 

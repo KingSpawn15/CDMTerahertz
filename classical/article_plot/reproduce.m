@@ -1,4 +1,4 @@
-clearvars;
+% clearvars;
 
 
 [laser_parameters,discretization_params, utem_parameters,...
@@ -93,7 +93,7 @@ zz = -1e-6;
 dd = .5e-3;
 lambda = 800e-9;
 tau = 30e-15;
-sigma_z = 40e-6;
+sigma_z = 55e-6;
 [t0_vec, eels_calc] = eels_theoretical(tau, lambda, dd, zz, sigma_z);
 t0_vec = t0_vec - 0.1;
 eels_t = interp1(t0_vec.',eels_calc.',t_w,'linear','extrap');
