@@ -1,5 +1,5 @@
-% clear all
-% close all
+clear all
+close all
 % tau = 150e-15;
 % 
 % z = -1e-6;

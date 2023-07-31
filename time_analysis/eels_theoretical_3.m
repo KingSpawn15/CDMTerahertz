@@ -53,7 +53,7 @@ plot(tt_expo, expo(tt_expo, tau_arr(1) * 1e12)*plot_scaling + 0.5 * 4 , ...
     'LineWidth',1,'LineStyle','--','Color',[0.3,0.3,0.3]);
 hold off
 xlim([-1,2])
-% exportgraphics(gcf,'inas_time.png','Resolution',500)
+exportgraphics(gcf,'inas_time.png','Resolution',500)
 
 figure;
 
@@ -80,7 +80,7 @@ hold off
 xlim([0,12])
 ylim([-0.5,2.5])
 pbaspect([1 3 1])
-% exportgraphics(gcf,'inas_omega.png','Resolution',500)
+exportgraphics(gcf,'inas_omega.png','Resolution',500)
 
 %%
 
@@ -133,7 +133,7 @@ zticks([])
 view([-4,19])
 hold off;
 
-% exportgraphics(gcf, "loss_spec_inas.png",'Resolution',500)
+exportgraphics(gcf, "loss_spec_inas.png",'Resolution',500)
 
 function [line_electron] = electron_travel(t0, zmax, T, Z, ET, velec)
 %     t0 = -2;

@@ -3,7 +3,7 @@ close all
 tau = 150e-15;
 omega =  (0 : 2 * pi * 0.05e12 : 2 * pi * 20e12).';
 z = -1e-6;
-d = .5e-3;
+d_arr = [.05, .5, 1, 2, 5] * 1e-3;
 
 close all;
 omega_max = 2 * pi * (12)*1e12;
@@ -26,11 +26,11 @@ ngopt = @(lambda) nopt(lambda) - (lambda)*(nopt(lambda + delta_lambda) - ...
 lambda_arr = [740, 770, 800, 860, 1560]*1e-9;
 
 tau_arr = [200, 150, 100, 50, 30]*1e-15;
-[time_ps1, ethz_t1, omg1, eomg1] = electric_field_time(lambda_arr(3), tau_arr(1), z, d, ngopt, nTHz, nopt, np, omega_max);
-[time_ps2, ethz_t2, omg2, eomg2] = electric_field_time(lambda_arr(3), tau_arr(2), z, d, ngopt, nTHz, nopt, np, omega_max);
-[time_ps3, ethz_t3, omg3, eomg3] = electric_field_time(lambda_arr(3), tau_arr(3), z, d, ngopt, nTHz, nopt, np, omega_max);
-[time_ps4, ethz_t4, omg4, eomg4] = electric_field_time(lambda_arr(3), tau_arr(4), z, d, ngopt, nTHz, nopt, np, omega_max);
-[time_ps5, ethz_t5, omg5, eomg5] = electric_field_time(lambda_arr(3), tau_arr(5), z, d, ngopt, nTHz, nopt, np, omega_max);
+[time_ps1, ethz_t1, omg1, eomg1] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(1), ngopt, nTHz, nopt, np, omega_max);
+[time_ps2, ethz_t2, omg2, eomg2] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(2), ngopt, nTHz, nopt, np, omega_max);
+[time_ps3, ethz_t3, omg3, eomg3] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(3), ngopt, nTHz, nopt, np, omega_max);
+[time_ps4, ethz_t4, omg4, eomg4] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(4), ngopt, nTHz, nopt, np, omega_max);
+[time_ps5, ethz_t5, omg5, eomg5] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(5), ngopt, nTHz, nopt, np, omega_max);
 
 plot_scaling = 0.3;
 
@@ -45,15 +45,15 @@ hold on;
 
 expo = @(t,tau) exp(-(t.^2)/(tau^2)/2);
 tt_expo = (-2:0.01:3).';
-plot(tt_expo, expo(tt_expo, tau_arr(1) * 1e12)*plot_scaling + 0.5 * 4 , ...
-    tt_expo, expo(tt_expo, tau_arr(2) * 1e12)*plot_scaling + 0.5 * 3 , ...
-    tt_expo, expo(tt_expo, tau_arr(3) * 1e12)*plot_scaling + 0.5 * 2 , ...
-    tt_expo, expo(tt_expo, tau_arr(4) * 1e12)*plot_scaling + 0.5 * 1 , ...
+plot(tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 4 , ...
+    tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 3 , ...
+    tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 2 , ...
+    tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 1 , ...
     tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 0 , ...
     'LineWidth',1,'LineStyle','--','Color',[0.3,0.3,0.3]);
 hold off
 xlim([-1,2])
-% exportgraphics(gcf,'inas_time.png','Resolution',500)
+exportgraphics(gcf,'inas_time_boundary.png','Resolution',500)
 
 figure;
 
@@ -70,17 +70,17 @@ hold on;
 
 expo_omg = @(omg,tau) exp(-(omg.^2 .* tau^2)/2);
 nu_expo = (0:0.01:10).';
-plot(nu_expo,expo_omg(nu_expo *(2 * pi * 1e12), tau_arr(1))*plot_scaling + 0.5 * 4 , ...
-    nu_expo, expo_omg(nu_expo *(2 * pi * 1e12), tau_arr(2))*plot_scaling + 0.5 * 3 , ...
-    nu_expo , expo_omg(nu_expo *(2 * pi * 1e12), tau_arr(3))*plot_scaling + 0.5 * 2 , ...
-    nu_expo, expo_omg(nu_expo *(2 * pi * 1e12), tau_arr(4))*plot_scaling + 0.5 * 1 , ...
+plot(nu_expo,expo_omg(nu_expo *(2 * pi * 1e12), tau_arr(5))*plot_scaling + 0.5 * 4 , ...
+    nu_expo, expo_omg(nu_expo *(2 * pi * 1e12), tau_arr(5))*plot_scaling + 0.5 * 3 , ...
+    nu_expo , expo_omg(nu_expo *(2 * pi * 1e12), tau_arr(5))*plot_scaling + 0.5 * 2 , ...
+    nu_expo, expo_omg(nu_expo *(2 * pi * 1e12), tau_arr(5))*plot_scaling + 0.5 * 1 , ...
     nu_expo, expo_omg(nu_expo *(2 * pi * 1e12), tau_arr(5))*plot_scaling + 0.5 * 0 , ...
     'LineWidth',1,'LineStyle','--','Color',[0.3,0.3,0.3]);
 hold off
 xlim([0,12])
 ylim([-0.5,2.5])
 pbaspect([1 3 1])
-% exportgraphics(gcf,'inas_omega.png','Resolution',500)
+exportgraphics(gcf,'inas_omega_boundary.png','Resolution',500)
 
 %%
 
@@ -133,7 +133,7 @@ zticks([])
 view([-4,19])
 hold off;
 
-% exportgraphics(gcf, "loss_spec_inas.png",'Resolution',500)
+exportgraphics(gcf, "loss_spec_inas_boundary.png",'Resolution',500)
 
 function [line_electron] = electron_travel(t0, zmax, T, Z, ET, velec)
 %     t0 = -2;

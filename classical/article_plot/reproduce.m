@@ -1,4 +1,4 @@
-% clearvars;
+clearvars;
 
 
 [laser_parameters,discretization_params, utem_parameters,...
@@ -94,7 +94,7 @@ dd = .5e-3;
 lambda = 800e-9;
 tau = 30e-15;
 sigma_z = 55e-6;
-[t0_vec, eels_calc] = eels_theoretical(tau, lambda, dd, zz, sigma_z);
+[t0_vec, eels_calc] = eels_theoretical_2(tau, lambda, dd, zz, sigma_z);
 t0_vec = t0_vec - 0.1;
 eels_t = interp1(t0_vec.',eels_calc.',t_w,'linear','extrap');
 
@@ -114,14 +114,15 @@ psi_assemb_or  = assemble_psi_sub(t_w, e_w, e_exc_or, psi_sub_or);
 psi_assemb_comb  = assemble_psi_sub(t_w, e_w, e_exc_or + e_exc_pd, psi_sub_or);
 psi_assemb_theory  = assemble_psi_sub(t_w, e_w, eels_t * factor_th, psi_sub_or);
 psi_assemb_theory_comb  = assemble_psi_sub(t_w, e_w, e_exc_pd + eels_t * factor_th, psi_sub_or);
-psi_assemb_theory_neg  = assemble_psi_sub(t_w, e_w, e_exc_pd - eels_t * factor_th, psi_sub_or);
+psi_assemb_theory_neg  = assemble_psi_sub(t_w, e_w, e_exc_pd + cos(pi + 20 * pi/180) * eels_t * factor_th, psi_sub_or);
 close all
 plo1 = plot(t_w, factor_th * eels_t, t_w, e_exc_or);
 plo1(1).LineWidth = 2;
 plo1(2).LineWidth = 1;
 xlim([-1,1.5]);
-% xlim([-1,1.5])
-% exportgraphics(gcf,'classical/article_plot/comparison.png','Resolution',500)
+xlim([-1,1.5]);
+legend('Frequency Domain Model', 'Used for CLEO' )
+exportgraphics(gcf,'classical/article_plot/comparison.png','Resolution',500)
 
 
 % psi_incoherent_assemb = eels.incoherent_convolution(psi_assemb_comb , w, t_w, e_w);
@@ -146,7 +147,7 @@ ax.YTick = -.5:0.5:1.5;
 ax.XTick = -4:2:4;
 ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',22, 'FontName' , 'helvetica');
 xlabel('Energy [eV]','Color',[0.3 0.3 0.3],'FontSize',22, 'FontName' , 'helvetica');
-% exportgraphics(gcf,'classical/article_plot/comparison_90.png','Resolution',500)
+exportgraphics(gcf,'classical/article_plot/comparison_90.png','Resolution',500)
 
 
 figure;
@@ -164,7 +165,7 @@ ax.YTick = -.5:0.5:1.5;
 ax.XTick = -4:2:4;
 ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',22, 'FontName' , 'helvetica');
 xlabel('Energy [eV]','Color',[0.3 0.3 0.3],'FontSize',22, 'FontName' , 'helvetica');
-% exportgraphics(gcf,'classical/article_plot/comparison_0.png','Resolution',500)
+exportgraphics(gcf,'classical/article_plot/comparison_0.png','Resolution',500)
 %%
 function psi_assemb = assemble_psi_sub(t_w, e_w, eels, psi_sub)
     psi_assemb = 1;
