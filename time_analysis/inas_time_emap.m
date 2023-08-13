@@ -31,7 +31,7 @@ alpha3 = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda)) * 1e-1;
 alpha4 = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda)) * 1e-2;
 alpha5 = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda)) * 1e-3;
 
-tau_arr = [200, 150, 100, 50, 30]*1e-15;
+tau_arr = [200, 150, 100, 50, 25]*1e-15;
 [time_ps1, ethz_t1, omg1, eomg1] = electric_field_time(lambda_arr(3), tau_arr(5), ...
     z, d_arr(2), ngopt, nTHz, nopt, np, omega_max, alpha1);
 [time_ps2, ethz_t2, omg2, eomg2] = electric_field_time(lambda_arr(3), tau_arr(5), ...
@@ -125,7 +125,7 @@ pbaspect([1 3 1])
 %%
 % close all
 velec = 0.7 * 3 * 10^(8-12);
-sigma_z = 30 * 1e-6;
+sigma_z = 20 * 1e-6;
 
 ethz_t = ethz_t2;
 tt_t = time_ps5;
