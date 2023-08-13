@@ -25,24 +25,38 @@ ngopt = @(lambda) nopt(lambda) - (lambda)*(nopt(lambda + delta_lambda) - ...
 %%
 lambda_arr = [740, 770, 800, 860, 1560]*1e-9;
 
+alpha1 = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda)) * 0.5 * 1e1;
+alpha2 = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda)) * 1e0;
+alpha3 = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda)) * 1e-1;
+alpha4 = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda)) * 1e-2;
+alpha5 = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda)) * 1e-3;
+
 tau_arr = [200, 150, 100, 50, 30]*1e-15;
-[time_ps1, ethz_t1, omg1, eomg1] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(1), ngopt, nTHz, nopt, np, omega_max);
-[time_ps2, ethz_t2, omg2, eomg2] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(2), ngopt, nTHz, nopt, np, omega_max);
-[time_ps3, ethz_t3, omg3, eomg3] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(3), ngopt, nTHz, nopt, np, omega_max);
-[time_ps4, ethz_t4, omg4, eomg4] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(4), ngopt, nTHz, nopt, np, omega_max);
-[time_ps5, ethz_t5, omg5, eomg5] = electric_field_time(lambda_arr(3), tau_arr(5), z, d_arr(5), ngopt, nTHz, nopt, np, omega_max);
+[time_ps1, ethz_t1, omg1, eomg1] = electric_field_time(lambda_arr(3), tau_arr(5), ...
+    z, d_arr(2), ngopt, nTHz, nopt, np, omega_max, alpha1);
+[time_ps2, ethz_t2, omg2, eomg2] = electric_field_time(lambda_arr(3), tau_arr(5), ...
+    z, d_arr(2), ngopt, nTHz, nopt, np, omega_max, alpha2);
+[time_ps3, ethz_t3, omg3, eomg3] = electric_field_time(lambda_arr(3), tau_arr(5),...
+    z, d_arr(2), ngopt, nTHz, nopt, np, omega_max, alpha3);
+[time_ps4, ethz_t4, omg4, eomg4] = electric_field_time(lambda_arr(3), tau_arr(5),...
+    z, d_arr(2), ngopt, nTHz, nopt, np, omega_max, alpha4);
+[time_ps5, ethz_t5, omg5, eomg5] = electric_field_time(lambda_arr(3), tau_arr(5),...
+    z, d_arr(2), ngopt, nTHz, nopt, np, omega_max, alpha5);
 
-plot_scaling = 0.3;
 
-plot(time_ps1, real(ethz_t1)/max(real(ethz_t2))*plot_scaling + 0.5 * 4 , ...
+% ethz_t5(time_ps5 < 0.5) = 0;
+plot_scaling = 0.1;
+
+figure;
+tiledlayout(1,2,'TileSpacing','compact');
+nexttile;
+plot(time_ps1, real(ethz_t1)/max(real(ethz_t1))*plot_scaling + 0.5 * 4 , ...
     time_ps2, real(ethz_t2)/max(real(ethz_t2))*plot_scaling+ 0.5 * 3,...
-     time_ps3, real(ethz_t3)/max(real(ethz_t2))*plot_scaling+ 0.5 * 2,...
-      time_ps4, real(ethz_t4)/max(real(ethz_t2))*plot_scaling+ 0.5 * 1,...
-       time_ps5, real(ethz_t5)/max(real(ethz_t2))*plot_scaling+ 0.5 * 0,...
+     time_ps3, real(ethz_t3)/max(real(ethz_t3))*plot_scaling+ 0.5 * 2,...
+      time_ps4, real(ethz_t4)/max(real(ethz_t4))*plot_scaling+ 0.5 * 1,...
+       time_ps5, real(ethz_t5)/max(real(ethz_t5))*plot_scaling+ 0.5 * 0,...
     'LineWidth',1);
-
 hold on;
-
 expo = @(t,tau) exp(-(t.^2)/(tau^2)/2);
 tt_expo = (-2:0.01:3).';
 plot(tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 4 , ...
@@ -52,9 +66,33 @@ plot(tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 4 , ...
     tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 0 , ...
     'LineWidth',1,'LineStyle','--','Color',[0.3,0.3,0.3]);
 hold off
-xlim([-1,2])
-exportgraphics(gcf,'inas_time_boundary.png','Resolution',500)
+xlim([-1,2.5]);
 
+nexttile;
+
+plot_scaling = 0.1 * 10;
+plot(time_ps1, real(ethz_t1)/max(real(ethz_t1))*plot_scaling + 0.5 * 4 , ...
+    time_ps2, real(ethz_t2)/max(real(ethz_t2))*plot_scaling+ 0.5 * 3,...
+     time_ps3, real(ethz_t3)/max(real(ethz_t3))*plot_scaling+ 0.5 * 2,...
+      time_ps4, real(ethz_t4)/max(real(ethz_t4))*plot_scaling+ 0.5 * 1,...
+       time_ps5, real(ethz_t5)/max(real(ethz_t5))*plot_scaling+ 0.5 * 0,...
+    'LineWidth',1);
+hold on;
+expo = @(t,tau) exp(-(t.^2)/(tau^2)/2);
+tt_expo = (-2:0.01:3).';
+plot(tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 4 , ...
+    tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 3 , ...
+    tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 2 , ...
+    tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 1 , ...
+    tt_expo, expo(tt_expo, tau_arr(5) * 1e12)*plot_scaling + 0.5 * 0 , ...
+    'LineWidth',1,'LineStyle','--','Color',[0.3,0.3,0.3]);
+hold off
+yticks('')
+xlim([10.5,15]);
+xticks([11:15])
+% exportgraphics(gcf,'results_absorption/inas_time_absorption.png','Resolution',500)
+
+%%
 figure;
 
 plot_scaling = 0.3;
@@ -80,16 +118,16 @@ hold off
 xlim([0,12])
 ylim([-0.5,2.5])
 pbaspect([1 3 1])
-exportgraphics(gcf,'inas_omega_boundary.png','Resolution',500)
+% exportgraphics(gcf,'results_absorption/inas_omega_absorption.png','Resolution',500)
 
 %%
 
 %%
 % close all
 velec = 0.7 * 3 * 10^(8-12);
-sigma_z = 55 * 1e-6;
+sigma_z = 30 * 1e-6;
 
-ethz_t = ethz_t5;
+ethz_t = ethz_t2;
 tt_t = time_ps5;
 
 % ethz_t = real(ethz_t(tt_t < 3 & tt_t >-2));
@@ -113,7 +151,7 @@ s.EdgeColor = 'none';
 brighten(-.5);
 hold on;
 
-eels = real(eels)
+eels = real(eels);
 c = line((t0_vec), (t0_vec) * 0 + 5*sigma_z, 4+2.5 * eels / max(abs(eels)));
 set(c,'Color','blue')
 c.LineWidth = 1;
@@ -133,7 +171,28 @@ zticks([])
 view([-4,19])
 hold off;
 
-exportgraphics(gcf, "loss_spec_inas_boundary.png",'Resolution',500)
+% exportgraphics(gcf, "results_absorption/loss_spec_inas_absorption.png",'Resolution',500)
+
+
+%%
+% plot((t0_vec), eels / max(abs(eels)));
+dir= 'time_analysis/results_efield_map/';
+figure;
+ttvec = T(1:end,1);
+zzvec = Z(1,1:end).';
+imagesc(ttvec, zzvec * 1e6, real(ET).' / max(real(ET(:))),[-1,1]);
+set(gca,'FontSize',12);
+ylim([-120,120]);
+xlim([-.3,1.5]);
+xticks(-.3:.3:1.5)
+colormap(redblue);
+pbaspect([1 0.5 1])
+colorbar;
+
+exportgraphics(gcf, strcat(dir,'emap_rectification_2.png'),'Resolution',500)
+% imagesc(ttvec , zzvec, ET);
+
+%%
 
 function [line_electron] = electron_travel(t0, zmax, T, Z, ET, velec)
 %     t0 = -2;
@@ -186,4 +245,39 @@ function [line_vert, line_horz] = grid_lines(tp, max_z, t0_vec, eels)
 end
 
 
+function c = redblue(m)
+%REDBLUE    Shades of red and blue color map
+%   REDBLUE(M), is an M-by-3 matrix that defines a colormap.
+%   The colors begin with bright blue, range through shades of
+%   blue to white, and then through shades of red to bright red.
+%   REDBLUE, by itself, is the same length as the current figure's
+%   colormap. If no figure exists, MATLAB creates one.
+%
+%   For example, to reset the colormap of the current figure:
+%
+%             colormap(redblue)
+%
+%   See also HSV, GRAY, HOT, BONE, COPPER, PINK, FLAG, 
+%   COLORMAP, RGBPLOT.
+%   Adam Auton, 9th October 2009
+if nargin < 1, m = size(get(gcf,'colormap'),1); end
+if (mod(m,2) == 0)
+    % From [0 0 1] to [1 1 1], then [1 1 1] to [1 0 0];
+    m1 = m*0.5;
+    r = (0:m1-1)'/max(m1-1,1);
+    g = r;
+    r = [r; ones(m1,1)];
+    g = [g; flipud(g)];
+    b = flipud(r);
+else
+    % From [0 0 1] to [1 1 1] to [1 0 0];
+    m1 = floor(m*0.5);
+    r = (0:m1-1)'/max(m1,1);
+    g = r;
+    r = [r; ones(m1+1,1)];
+    g = [g; 1; flipud(g)];
+    b = flipud(r);
+end
+c = [r g b]; 
+end
 

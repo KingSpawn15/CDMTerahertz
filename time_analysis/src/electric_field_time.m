@@ -1,4 +1,4 @@
-function [time_ps, ethz_t, omg, eomg] = electric_field_time(lambda, tau, z, d, ngopt, nTHz, nopt, np, omega_max)
+function [time_ps, ethz_t, omg, eomg] = electric_field_time(lambda, tau, z, d, ngopt, nTHz, nopt, np, omega_max, alpha)
 
 
     C = 3e8;
@@ -7,8 +7,10 @@ function [time_ps, ethz_t, omg, eomg] = electric_field_time(lambda, tau, z, d, n
 
     Ii = @(omega, tau) tau * sqrt(pi) * exp(-(tau^2 * omega.^2)/2);
 
-
-    alpha = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda));
+    if nargin < 10
+        alpha = @(lambda)  (2 * pi / lambda) * imag(nopt(lambda));
+    end
+    
     q = @(omega) omega .* nTHz(omega) / C;
 
 %     q0 = @(omega, lambda) omega .* ngopt(lambda) / C  ;
@@ -49,7 +51,7 @@ function [time_ps, ethz_t, omg, eomg] = electric_field_time(lambda, tau, z, d, n
     
     
     eomg = eb(omg, lambda, tau, z, d);
-    plot(omg/(2 * pi), abs(eomg).^2)
+%     plot(omg/(2 * pi), abs(eomg).^2)
     ethz_omega = [zeros(6 * np, 1); eomg; zeros(4 * np, 1)];
     ethz_t = ifftshift(fft(fftshift(ethz_omega)));
     [~, max_ind ] =  max((real(ethz_t)));

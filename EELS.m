@@ -48,6 +48,41 @@ classdef EELS
             
         end
         
+%         function [interact_v_phi, interact_v_A] = interaction_v(self, params)
+%             %METHOD1 Summary of this method goes here
+%             %   Detailed explanation goes here
+%             
+%             method = params.method;
+%             interaction_gain_factor_rectification = params.interaction_gain_factor_rectification;
+%             interaction_gain_factor_photodember = params.interaction_gain_factor_photodember;
+%             
+%             switch method
+%                 
+%                 case "combination"
+%                     interact_v = ChargeDynamics.interaction_potential_rectification(self.discretization,...
+%                         self.material,...
+%                         self.laser , self.electron, self.numerical_parameters) * interaction_gain_factor_rectification + ...
+%                         ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
+%                         self.laser , self.numerical_parameters) * interaction_gain_factor_photodember;
+%                     
+%                 case "photodember"
+%                     interact_v = ChargeDynamics.interaction_potential_photodember(self.discretization, self.material,...
+%                         self.laser , self.numerical_parameters) * interaction_gain_factor_photodember;
+%                     
+%                 case "rectification"
+%                     [interact_v_phi,  interact_v_A] = ChargeDynamics.interaction_potential_rectification(self.discretization,...
+%                         self.material,...
+%                         self.laser , self.electron, self.numerical_parameters);
+%                     interact_v_phi =   interact_v_phi * interaction_gain_factor_rectification;
+%                     interact_v_A = interact_v_A * interaction_gain_factor_rectification;
+%             end
+%             
+%            
+%             interact_v_phi = movmean(movmean(interact_v_phi,3,1),10,2);
+%             interact_v_A = movmean(movmean(interact_v_A,3,1),10,2);
+%             
+%         end
+        
         function interact_v = interaction_v(self, params)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here

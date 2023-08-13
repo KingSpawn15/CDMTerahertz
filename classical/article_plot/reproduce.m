@@ -37,7 +37,7 @@ loss_spectrum_parameters.interaction_gain_factor_photodember = 0;
 
 interact_v_or_store = eels.interaction_v(loss_spectrum_parameters);
 
-%%
+
 loss_spectrum_parameters.method = 'photodember';
 loss_spectrum_parameters.interaction_gain_factor_rectification = 0;
 loss_spectrum_parameters.interaction_gain_factor_photodember = 1;
@@ -88,17 +88,20 @@ ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',18);
 xlabel('Energy (eV)','Color',[0.3 0.3 0.3],'FontSize',18);
 
 %%
+t_w_2 = t_w;
+
+t_w = t_w + 0.1;
 
 zz = -1e-6;
 dd = .5e-3;
 lambda = 800e-9;
-tau = 30e-15;
-sigma_z = 55e-6;
+tau = 25e-15;
+sigma_z = 40e-6;
 [t0_vec, eels_calc] = eels_theoretical_2(tau, lambda, dd, zz, sigma_z);
-t0_vec = t0_vec - 0.1;
+t0_vec = t0_vec - 0.1 + 0.1;
 eels_t = interp1(t0_vec.',eels_calc.',t_w,'linear','extrap');
 
-
+eels_t = circshift(eels_t,0);
 
 [~, eels_ind_pd] = max(psi_sub_pd,[],2);
 [~, eels_ind_or] = max(psi_sub_or,[],2);
@@ -106,9 +109,10 @@ eels_ind_pd = circshift(eels_ind_pd,0);
 e_exc_pd = e_w(eels_ind_pd);
 e_exc_or = e_w(eels_ind_or);
 
-e_exc_pd = circshift(e_exc_pd,0)
+tun = .9;
+e_exc_pd = circshift(e_exc_pd,0) * tun;
 
-factor_th = -1.65;
+factor_th = -1.5 * tun;
 psi_assemb_pd  = assemble_psi_sub(t_w, e_w, e_exc_pd, psi_sub_or);
 psi_assemb_or  = assemble_psi_sub(t_w, e_w, e_exc_or, psi_sub_or);
 psi_assemb_comb  = assemble_psi_sub(t_w, e_w, e_exc_or + e_exc_pd, psi_sub_or);
@@ -166,6 +170,8 @@ ax.XTick = -4:2:4;
 ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',22, 'FontName' , 'helvetica');
 xlabel('Energy [eV]','Color',[0.3 0.3 0.3],'FontSize',22, 'FontName' , 'helvetica');
 exportgraphics(gcf,'classical/article_plot/comparison_0.png','Resolution',500)
+
+t_w = t_w_2;
 %%
 function psi_assemb = assemble_psi_sub(t_w, e_w, eels, psi_sub)
     psi_assemb = 1;
