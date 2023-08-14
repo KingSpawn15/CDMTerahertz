@@ -56,6 +56,15 @@ interact_v_or = circshift(interact_v_or_store, [-15 ,0]);
 
 t_w = t_w_store-0.2;
 
+alpha_pd = alpha_pd_0; alpha_or =  alpha_or_0;
+loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
+    interact_v_or * alpha_or;
+
+
+% loss_spectrum_parameters.interact_v = interact_v_pd * 0.07*exp(1i*0);
+
+[psi_sub_comb , psi_incoherent_comb] = eels.energy_loss_spectrum(loss_spectrum_parameters);
+
 
 alpha_pd = 0; alpha_or =  alpha_or_0;
 loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
@@ -75,7 +84,7 @@ loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
 
 [psi_sub_pd , psi_incoherent_pd] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 
-imagesc(e_w,t_w, psi_sub_pd);
+imagesc(e_w,t_w, psi_incoherent_comb);
 
 ylim([-1 , 1.5]);
 colormap jet
