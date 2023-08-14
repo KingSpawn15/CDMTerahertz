@@ -10,7 +10,7 @@ classdef ChargeDynamics
 
 
 
-        function interaction_v =  ...
+        function [interaction_v_phi, interaction_v_A] =  ...
                 interaction_potential_rectification(discretization, material,...
                 laser , electron, numerical_parameters)
             % Physical constants
@@ -124,7 +124,7 @@ classdef ChargeDynamics
                 laser_ts =  laser_ts.*  skew3;            
 
 
-%                 laser_t =   0.2 * laser_t2 + 0.2 * laser_t3 + 1*laser_t;
+                laser_t =   0.2 * laser_t2 + 0.2 * laser_t3 + 1*laser_t;
                 
 %                 t_cutoff = 0.4e-12;
 %                 t_cutoff_high = 20e-12;
@@ -171,19 +171,30 @@ classdef ChargeDynamics
                 %                 interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi),2) ) ,1),3);
 
 
-% 
+
 %                 interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi-electron_velocity.*dA),2) + dPhi_Y0) ,1),3)...
 %                     + trapz(d_xprime,trapz(d_yprime,dPhi_Z0,2),1);
-                interaction_v(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(0*dPhi-0*electron_velocity.*dA),2) + 1*dPhi_Y0) ,1),3)...
-                                    + trapz(d_xprime,trapz(d_yprime,0*dPhi_Z0,2),1);
+            interaction_v_phi(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(dPhi-0.*dA),2) + dPhi_Y0) ,1),3)...
+                                + trapz(d_xprime,trapz(d_yprime,dPhi_Z0,2),1);
+            interaction_v_A(time_ind,:) = trapz(d_zprime,trapz(d_xprime, (trapz(d_yprime,(0 * dPhi-electron_velocity.*dA),2) + 0 *dPhi_Y0) ,1),3)...
+                                + trapz(d_xprime,trapz(d_yprime,0 *dPhi_Z0,2),1);
 
             end
 
             % Return to original t
+            interaction_v = interaction_v_phi;
             interaction_v = interp1(t_c_subsampled,interaction_v,t_c);
             interaction_v = interaction_v';
             interaction_v = [zeros(length(discretization.z),length(discretization.t)-length(t_c)),interaction_v];
             interaction_v(isnan(interaction_v)) = 0;
+            interaction_v_phi = interaction_v;
+
+            interaction_v = interaction_v_A;
+            interaction_v = interp1(t_c_subsampled,interaction_v,t_c);
+            interaction_v = interaction_v';
+            interaction_v = [zeros(length(discretization.z),length(discretization.t)-length(t_c)),interaction_v];
+            interaction_v(isnan(interaction_v)) = 0;
+            interaction_v_A = interaction_v;
             %             interaction_v = circshift(interaction_v,-round(t0/dt),2);
 
         end

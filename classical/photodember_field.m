@@ -13,7 +13,7 @@ discretization_params.z_max = 100e-6;
 utem_parameters.electron_total_energy = 0.94;
 laser_parameters.laser_pulse_time_fwhm = 650e-15;
 laser_parameters.theta_pol = 90*pi/180;
-
+laser_parameters.laser_spot_fwhm = 40e-6;
 laser = Laser(laser_parameters);
 
 discretization = Discretization(discretization_params);
@@ -42,7 +42,7 @@ eels = EELS(eels_parameters);
 loss_spectrum_parameters.method = 'photodember';
 loss_spectrum_parameters.interaction_gain_factor_rectification = 0;
 loss_spectrum_parameters.interaction_gain_factor_photodember = 1;
-
+%%
 interact_v_pd_store = eels.interaction_v(loss_spectrum_parameters);
 
 
