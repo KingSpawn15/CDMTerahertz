@@ -1,6 +1,7 @@
 clear all;
 close all;
-
+ delete(gcp('nocreate'))
+ parpool(6)
 [laser_parameters,discretization_params, utem_parameters,...
     numerical_parameters] = default_parameters_2();
 
@@ -57,25 +58,23 @@ interact_v_or = circshift(interact_v_or_store, [-15 ,0]);
 t_w = t_w_store-0.2;
 
 
+alpha_pd = 0; alpha_or =  alpha_or_0;
+loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
+    interact_v_or * alpha_or;
+[psi_sub_or , psi_incoherent_or] = eels.energy_loss_spectrum(loss_spectrum_parameters);
+
+alpha_pd = alpha_pd_0; alpha_or =  0;
+loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
+    interact_v_or * alpha_or;
+[psi_sub_pd , psi_incoherent_pd] = eels.energy_loss_spectrum(loss_spectrum_parameters);
+
 alpha_pd = alpha_pd_0; alpha_or =  alpha_or_0;
 loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
     interact_v_or * alpha_or;
+[psi_sub_comb , psi_incoherent_comb] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 
-
-% loss_spectrum_parameters.interact_v = interact_v_pd * 0.07*exp(1i*0);
-
-[psi_sub_or , psi_incoherent_or] = eels.energy_loss_spectrum(loss_spectrum_parameters);
-
-% alpha_pd = alpha_pd_0; alpha_or =  0;
-loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd + ...
-    interact_v_or * alpha_or;
-
-
-% loss_spectrum_parameters.interact_v = interact_v_pd * 0.07*exp(1i*0);
-
-[psi_sub_pd , psi_incoherent_pd] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 figure;
-imagesc(e_w,t_w, psi_incoherent_pd);
+imagesc(e_w,t_w, psi_incoherent_comb);
 
 ylim([-1 , 1.5]);
 colormap jet
@@ -98,7 +97,7 @@ lambda = 800e-9;
 tau = 30e-15;
 sigma_z = 55e-6;
 [t0_vec, eels_calc] = eels_theoretical_2(tau, lambda, dd, zz, sigma_z);
-t0_vec = t0_vec - 0.1 + 0.1;
+t0_vec = t0_vec - 0.1 ;
 eels_t = interp1(t0_vec.',eels_calc.',t_w,'linear','extrap');
 
 eels_t = circshift(eels_t,0);
@@ -112,13 +111,13 @@ e_exc_or = e_w(eels_ind_or);
 tun = 1;
 % e_exc_pd = circshift(e_exc_pd,0) * tun;
 
-factor_th = -1. * tun;
+factor_th = -1.65 * tun;
 psi_assemb_pd  = assemble_psi_sub(t_w, e_w, e_exc_pd, psi_sub_or);
 psi_assemb_or  = assemble_psi_sub(t_w, e_w, e_exc_or, psi_sub_or);
 psi_assemb_comb  = assemble_psi_sub(t_w, e_w, e_exc_or + e_exc_pd, psi_sub_or);
 psi_assemb_theory  = assemble_psi_sub(t_w, e_w, eels_t * factor_th, psi_sub_or);
 psi_assemb_theory_comb  = assemble_psi_sub(t_w, e_w, e_exc_pd + eels_t * factor_th, psi_sub_or);
-psi_assemb_theory_neg  = assemble_psi_sub(t_w, e_w, e_exc_pd + cos(pi + 20 * pi/180) * eels_t * factor_th, psi_sub_or);
+psi_assemb_theory_neg  = assemble_psi_sub(t_w, e_w, e_exc_pd + -cos(2 * 45 * pi/180) * eels_t * factor_th, psi_sub_or);
 close all
 plo1 = plot(t_w, factor_th * eels_t, t_w, e_exc_or);
 plo1(1).LineWidth = 2;

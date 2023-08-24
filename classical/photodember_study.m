@@ -1,51 +1,28 @@
-clear all;
-close all;
 delete(gcp('nocreate'))
 delete(gcp('nocreate'))
 parpool(6);
 
+parfor i = 1:10
+end
 
- [eels, w, e_w, t_w_store, tt, zz]= eels_setup();
+clear all;
+close all;
+
+
+
+[eels, w, e_w, t_w_store, tt, zz]= eels_setup();
 interact_v_pd_store = utils.eels_pdor(eels,'photodember');
-interact_v_or_store = utils.eels_pdor(eels,'rectification');
+% interact_v_or_store = utils.eels_pdor(eels,'rectification');
 
 %%
 
-alpha_pd_0 =  .07;
-alpha_or_0 = 20 * 1.3 * 1.2;
-
+alpha_pd_0 =  .09;
 interact_v_pd = circshift(interact_v_pd_store, [18,0]);
-interact_v_or = circshift(interact_v_or_store, [-15,0]);
+
 
 t_w = t_w_store-0.2;
-
-
-% alpha_pd = alpha_pd_0; 
-loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd_0 + interact_v_or * alpha_or_0;
+loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd_0;
 [psi_sub_pd , psi_incoherent_pd] = eels.energy_loss_spectrum(loss_spectrum_parameters);
-
-%%
-
-
-[~, eels_ind_pd] = max(psi_sub_pd,[],2);
-e_exc_pd = e_w(eels_ind_pd);
-
-
-[TT, ZZ] = ndgrid(tt,zz);
-vv = interact_v_pd_store;
-electric_field_zt = -derivative_f_dt(vv, zz, tt);
-electric_field_zt(isnan(electric_field_zt)) = 0;
-velec = 0.7 * 3 * 10^(8-12);
-[T, Z, ET, t0_vec, eels_cc] = eels_pd(electric_field_zt.', tt * 1e12, zz , velec);
-eels_cc = eels_cc/max(abs(eels_cc(:)))*abs(max(e_exc_pd(:)));
-
-
-eels_t = interp1(t0_vec.',eels_cc.',t_w,'linear','extrap');
-psi_assemb_pd  = assemble_psi_sub(t_w, e_w, eels_t, psi_sub_pd);
-psi_incoherent_comb = eels.incoherent_convolution(psi_assemb_pd, w, t_w, e_w);
-
-
-
 
 % Close all figures
 close all
@@ -56,44 +33,6 @@ setdir = 'classical/results/';
 % Set uniform font size and type
 FontSize = 14;
 FontName = 'helvetica';
-
-% Plot e_exc_pd vs t_w
-figure;
-plot(e_exc_pd, t_w ,'LineWidth',2)
-ylim([-1,1.5]);
-xlim([-5,5]);
-hold on;
-plot(eels_cc,t0_vec(:),'r--','LineWidth',2)
-legend('CDEM','Classical','FontSize',FontSize)
-hold off
-set(gca,'YDir','reverse') ;
-set(gca,'FontSize',FontSize);
-xticks(-4:2:4);
-
-
-% Plot surface of ZZ, TT, and electric_field_zt
-figure;
-s=surf(ZZ, TT, real(electric_field_zt).' / max(real(electric_field_zt(:))));
-s.EdgeColor = 'none';
-
-% Plot image of tt, zz, and electric_field_zt
-figure;
-imagesc(tt * 1e12, zz * 1e6, real(electric_field_zt)/ max(abs(real(electric_field_zt(:)))),[-1,1]);
-set(gca,'FontSize',FontSize);
-xlim([-.3,1.5]);
-xticks(-.3:.3:1.5)
-colormap(redblue);
-pbaspect([2 1 1])
-colorbar;
-
-% Plot image of e_w, t_w, and psi_incoherent_comb
-figure;
-imagesc(e_w,t_w, psi_incoherent_comb);
-ylim([-1 , 1.5]);
-colormap jet
-axis square
-set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,-4:2:4,'\Deltat [ps]','Energy [eV]',FontSize,[0.3 0.3 0.3])
-
 
 % Plot image of e_w, t_w, and psi_incoherent_pd
 figure;
@@ -241,16 +180,16 @@ c = [r g b];
 end
 
 function [eels, w, e_w, t_w_store, tt, zz]= eels_setup()
-%     spot_fwhm = 40e-6;
-%     [laser_parameters,discretization_params, utem_parameters,...
-%         numerical_parameters] = default_parameters_2(spot_fwhm);
-     [laser_parameters,discretization_params, utem_parameters,...
-        numerical_parameters] = default_parameters_2();
+    spot_fwhm = 80e-6;
+    [laser_parameters,discretization_params, utem_parameters,...
+        numerical_parameters] = default_parameters_2(spot_fwhm);
+%      [laser_parameters,discretization_params, utem_parameters,...
+%         numerical_parameters] = default_parameters_2();
     
     laser_parameters.pulse_energy_experiment = 1e-9;
     discretization_params.l = 1.5e-12 * 3  * discretization_params.fs;
     discretization_params.delay_max = 2 * 1.5e-12;
-    discretization_params.z_max = 30e-6;
+    discretization_params.z_max = 70e-6;
     
     utem_parameters.electron_total_energy = 0.94;
     laser_parameters.laser_pulse_time_fwhm = 650e-15;
