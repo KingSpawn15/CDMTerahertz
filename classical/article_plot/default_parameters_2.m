@@ -22,7 +22,7 @@ discretization_params.t0 = -0.5e-12;
 
 discretization_params.xprime_max = 3 * Laser.calculate_sigma(laser_parameters.laser_spot_fwhm) ;
 discretization_params.d_xprime = 4e-2 * 3 * Laser.calculate_sigma(laser_parameters.laser_spot_fwhm) ;
-discretization_params.d_xprime = 2e-6 ;
+% discretization_params.d_xprime = 2e-6 ;
 
 
 discretization_params.yprime_max = 1e-6;

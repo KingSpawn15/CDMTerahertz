@@ -10,7 +10,7 @@ discretization_params.l = 1.5e-12 * 3  * discretization_params.fs;
 discretization_params.delay_max = 2 * 1.5e-12;
 
 utem_parameters.electron_total_energy = 0.94;
-laser_parameters.laser_pulse_time_fwhm = 50e-15;
+laser_parameters.laser_pulse_time_fwhm = 650e-15;
 laser_parameters.theta_pol = 90*pi/180;
 
 laser = Laser(laser_parameters);
@@ -52,12 +52,12 @@ interact_v_or_store = eels.interaction_v(loss_spectrum_parameters);
 close all
 %%
 % alpha_pd_0 =  .07;
-% alpha_or_0 = 20 * 1.3 * 1.2;
-alpha_or_0 = 1 * 1.3 * 1.2;
+alpha_or_0 = 20 * 1.3 * 1.2;
+% alpha_or_0 = 1 * 1.3 * 1.2;
 
 % interact_v_pd = circshift(interact_v_pd_store, [18,0]);
-% interact_v_or = circshift(interact_v_or_store, [-15 ,0]);
-interact_v_or = circshift(interact_v_or_store, [0 ,0]);
+interact_v_or = circshift(interact_v_or_store, [-15 ,0]);
+% interact_v_or = circshift(interact_v_or_store, [0 ,0]);
 
 
 t_w = t_w_store-0.2;

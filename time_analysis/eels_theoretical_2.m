@@ -1,4 +1,4 @@
-function [t0_vec, eels] = eels_theoretical_2(tau, lambda, d, z, sigma_z)
+function [t0_vec, eels,T, Z, ET] = eels_theoretical_2(tau, lambda, d, z, sigma_z)
 % close all;
 % omega = 2 * pi * 1e12;
 omega_max = 2 * pi * 12e12;
@@ -24,7 +24,7 @@ tt_t = time_ps;
 ethz_t = real(ethz_t(tt_t < 10 & tt_t >-10));
 ethz_t = ethz_t/max(ethz_t);
 tt_t = tt_t(tt_t < 10 & tt_t >-10);
-[~, ~, ~, t0_vec, eels] = eels_calc(ethz_t, tt_t, sigma_z, velec);
+[T, Z, ET, t0_vec, eels] = eels_calc(ethz_t, tt_t, sigma_z, velec);
 eels = -eels./max(abs(eels));
 
 

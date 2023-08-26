@@ -21,9 +21,12 @@ t_w = t_w_store-0.2;
 
 
 % alpha_pd = alpha_pd_0; 
-loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd_0 + interact_v_or * alpha_or_0;
+loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd_0 + interact_v_or * 0;
 [psi_sub_pd , psi_incoherent_pd] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 
+% alpha_pd = alpha_pd_0; 
+loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd_0 + interact_v_or * alpha_or_0;
+[psi_sub_comb , psi_incoherent_comb] = eels.energy_loss_spectrum(loss_spectrum_parameters);
 %%
 
 
@@ -33,7 +36,7 @@ e_exc_pd = e_w(eels_ind_pd);
 
 [TT, ZZ] = ndgrid(tt,zz);
 vv = interact_v_pd_store;
-electric_field_zt = -derivative_f_dt(vv, zz, tt);
+electric_field_zt = derivative_f_dz(vv, zz, tt);
 electric_field_zt(isnan(electric_field_zt)) = 0;
 velec = 0.7 * 3 * 10^(8-12);
 [T, Z, ET, t0_vec, eels_cc] = eels_pd(electric_field_zt.', tt * 1e12, zz , velec);
@@ -51,7 +54,7 @@ psi_incoherent_comb = eels.incoherent_convolution(psi_assemb_pd, w, t_w, e_w);
 close all
 
 % Set directory for saving figures
-setdir = 'classical/results/';
+setdir = 'Figure 1 fields/results/';
 
 % Set uniform font size and type
 FontSize = 14;
