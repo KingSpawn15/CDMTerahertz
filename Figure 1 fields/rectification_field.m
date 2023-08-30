@@ -134,11 +134,15 @@ exportgraphics(gcf,'classical/article_plot/comparison.png','Resolution',500)
 % ylim([-1 , 1.5]);
 % close all
 
+%%
 % Set uniform font size and type
-FontSize = 14;
-FontName = 'helvetica';
+close all
+FontSize = 10;
+FontName = 'ariel';
 % Plot image of tt, zz, and electric_field_zt
-imagesc(T(:,1), Z(1,:) * 1e6 , real(ET.')/ max(abs(real(ET(:)))),[-1,1]);
+EFIELD = real(ET.')/ max(abs(real(ET(:))));
+
+imagesc(T(:,1), Z(1,:) * 1e6 , EFIELD,[-1,1]);
 set(gca,'FontSize',FontSize);
 xlim([-.3,1.5]);
 ylim([-100,100]);
@@ -146,7 +150,8 @@ xticks(-.3:.3:1.5)
 colormap(utils.redblue);
 pbaspect([2 1 1])
 colorbar;
-
+set(gcf, 'position', [200, 200, 200 + 150 , 200 + 75]);
+%%
 
 figure;
 psi_incoherent_comb = eels.incoherent_convolution(psi_assemb_theory_comb, w, t_w, e_w);
@@ -185,7 +190,7 @@ ylabel('\Deltat [ps]','Color',[0.3 0.3 0.3],'FontSize',22, 'FontName' , 'helveti
 xlabel('Energy [eV]','Color',[0.3 0.3 0.3],'FontSize',22, 'FontName' , 'helvetica');
 exportgraphics(gcf,'classical/article_plot/comparison_0.png','Resolution',500)
 
-t_w = t_w_2;
+t_w = t_w_store;
 %%
 function psi_assemb = assemble_psi_sub(t_w, e_w, eels, psi_sub)
     psi_assemb = 1;
@@ -208,3 +213,19 @@ function psi_assemb = assemble_psi_sub(t_w, e_w, eels, psi_sub)
     
 
 end
+
+function dfdz = derivative_f_dz(f_values, z_values, t_values)
+    % Check if the input matrices have compatible sizes
+    if size(f_values, 1) ~= length(z_values) || size(f_values, 2) ~= length(t_values)
+        error('Input matrix dimensions do not match with vector sizes.');
+    end
+
+    % Calculate the derivative using the finite difference method
+    dz = z_values(2) - z_values(1); % Assuming uniform grid spacing
+    dfdz = diff(f_values, 1, 1) ./ dz;
+
+    % Pad the dfdz matrix with NaNs to maintain the same size as f_values
+    dfdz = [dfdz; NaN(1, size(dfdz, 2))];
+end
+
+
