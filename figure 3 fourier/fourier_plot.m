@@ -17,7 +17,7 @@ end
 theta_chart = sortrows(theta_chart);
 
 ii = 1;
-for angle = [0: 2: 178]
+for angle = [0: 2: 0]
     %     angle = 10;
     %     [EnergyCrop,time,dataset] = measurement_plots.plot_measurement('saved_matrices/rectification.mat', angle);
 

@@ -1,227 +1,134 @@
 clear all
 close all
 
-[TPD, ZPD, EPD] = electric_field_photodember();
-[TOR, ZOR, EOR] = electric_field_rectification();
-
-EOR1 = EOR(ZOR(1,:) > min(ZPD(:)) & ZOR(1,:) < max(ZPD(:)),TOR(:,1) > min(TPD(:)) & TOR(:,1) < max(TPD(:)));
-TOR1 = TOR(TOR(:,1) > min(TPD(:)) & TOR(:,1) < max(TPD(:)),ZOR(1,:) > min(ZPD(:)) & ZOR(1,:) < max(ZPD(:)));
-ZOR1 = ZOR(TOR(:,1) > min(TPD(:)) & TOR(:,1) < max(TPD(:)),ZOR(1,:) > min(ZPD(:)) & ZOR(1,:) < max(ZPD(:)));
-EORintrap = interp2(TOR1.', ZOR1.', EOR1, TPD.', ZPD.', 'linear', 0);
+or_spot_sigma = 50e-6;
+pd_spot_fwhm = 40e-6;
+pd_z_max = 90e-6;
+pulse_energy_experiment_nj = 10;
 
 
-setdir = 'Figure 1 fields/results/';
-FontSize = 10;
-FontName = 'ariel';
+%% Get measurement    
+[mean_exp_0, ~, ~, eels_measure_0] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(0));
+[mean_exp_90, ~, ~, eels_measure_90] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(90));
+[mean_exp_45, deltat, energy, eels_measure_45] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(45));
 
-normalize = @(EE) real(EE)/ max(abs(real(EE(:))));
+%% Photodember field
+
+[TPD, ZPD, EPD,psi_sub_pd, psi_incoherent_pd, ...
+    eels, w, e_w, t_w, tt, zz] = electric_field_photodember(pulse_energy_experiment_nj, ...
+    pd_spot_fwhm, pd_z_max);
+EPD = EPD*(1.26/6.34);
+
+%% Rectification field
+rectification_param_z0 = -1e-6;
+rectification_param_thickness = .5e-3;
+rectification_param_wavelength = 800e-9;
+rectification_param_pulse_time_tau = 30e-15;
+rectification_param_pulse_laser_spot_sigma = or_spot_sigma;
+
+[~, ~,TOR, ZOR, EOR] = eels_theoretical_2(rectification_param_pulse_time_tau, ...
+    rectification_param_wavelength, ...
+    rectification_param_thickness, ...
+    rectification_param_z0, ...
+    rectification_param_pulse_laser_spot_sigma);
+
+EOR = EOR.';
+ZOR = ZOR .* 1e6;
 
 %%
-figure;
-imagesc(TPD(:,1), ZPD(1,:), normalize(EPD),[-1,1]);
-set(gca,'FontSize',FontSize);
-xlim([-.3,1.5]);
-ylim([-100,100]);
-xticks(-.3:.3:1.5)
-colormap(utils.redblue);
-pbaspect([2 1 1])
-set(gcf,'position', [200 , 200 , 200 + 150, 200 + 75]);
-exportgraphics(gcf, [setdir, 'field_photodember.png'],'resolution', 300);
+% Define the conditions
+condition1 = ZOR(1,:) > min(ZPD(:)) & ZOR(1,:) < max(ZPD(:));
+condition2 = TOR(:,1) > min(TPD(:)) & TOR(:,1) < max(TPD(:));
 
-figure;
-imagesc(TOR1(:,1), ZOR1(1,:), normalize(EOR1),[-1,1]);
-set(gca,'FontSize',FontSize);
-xlim([-.3,1.5]);
-ylim([-100,100]);
-xticks(-.3:.3:1.5)
-colormap(utils.redblue);
-pbaspect([2 1 1])
-set(gcf,'position', [200 , 200 , 200 + 150, 200 + 75]);
-exportgraphics(gcf, [setdir, 'field_rectification.png'],'resolution', 300);
+% Apply conditions to the arrays
+EOR1 = EOR(condition1, condition2);
+TOR1 = TOR(condition2, condition1);
+ZOR1 = ZOR(condition2, condition1);
+EORintrap = interp2(TOR1.', ZOR1.', EOR1, TPD.', ZPD.', 'linear', 0);
+EPDintrap = interp2(TPD.', ZPD.', EPD, TOR.', ZOR.', 'linear', 0);
 
-figure;
-imagesc(TPD(:,1), ZPD(1,:), normalize(EORintrap) + normalize(EPD),[-1,1]);
-set(gca,'FontSize',FontSize);
-xlim([-.3,1.5]);
-ylim([-100,100]);
-xticks(-.3:.3:1.5)
-colormap(utils.redblue);
-pbaspect([2 1 1])
-set(gcf,'position', [200 , 200 , 200 + 150, 200 + 75]);
-exportgraphics(gcf, [setdir, 'field_combined.png'],'resolution', 300);
+%%
+% [t0_vec_or, eels_cc_or] = utils_spectrum.calculate_spectrum_from_fields(EOR.', TOR, ZOR* 1e-6);
+[t0_vec_or, spectrum_or] = utils_spectrum.calculate_spectrum_from_fields((EOR + EPDintrap).', TOR, ZOR* 1e-6);
+%%
+% psi_sub_or = utils_spectrum.spectrum_to_coherent_eels(t_w, e_w, spectrum_or, t0_vec_or);
+% psi_incoherent_or = eels.incoherent_convolution(psi_sub_or, w, t_w, e_w);
+% 
+% FontName = 'ariel';
+% FontSize = 10;
+% figure;
+% plot_tile(e_w,t_w, psi_incoherent_or);
+% set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,-4:2:4,'','',FontSize,[0.3 0.3 0.3]);
+% set(gcf,'position', [200 , 200 , 200 + 150, 200 + 150]);
 
+%%
+close all
+setdir = 'figure 1 fields/results/';
+FontName = 'ariel';
+FontSize = 10;
 
-%% Function to set axis properties
+clim = max(abs(EOR1(:)));
+create_figure_electricfield(TPD, ZPD, EPD, clim/100, setdir, 'field_photodember.png', FontSize);
+create_figure_electricfield(TOR1, ZOR1, EOR1, clim, setdir, 'field_rectification.png', FontSize);
+create_figure_electricfield(TPD, ZPD, EORintrap + EPD, clim, setdir, 'field_combined.png', FontSize);
 
-function [T, Z, ET] = electric_field_rectification()
+%%
 
-    zz = -1e-6;
-    dd = .5e-3;
-    lambda = 800e-9;
-    tau = 30e-15;
-    sigma_z = 50e-6;
-    [~, ~,T, Z, ET] = eels_theoretical_2(tau, lambda, dd, zz, sigma_z);
-    ET = ET.';
-    Z = Z * 1e6;
-
+function create_figure_electricfield(T, Z, E, clim, setdir, filename, FontSize)
+    figure;
+    imagesc(T(:,1), Z(1,:), E, [-clim, clim]);
+    set(gca,'FontSize',FontSize);
+    xlim([-.3,1.5]);
+    ylim([-100,100]);
+    xticks(-.3:.3:1.5)
+    colormap(utils.redblue);
+    pbaspect([2 1 1])
+    set(gcf,'position', [200 , 200 , 200 + 150, 200 + 75]);
+    colorbar;
+    exportgraphics(gcf, [setdir, filename],'resolution', 300);
 end
 
 
-function [TT, ZZ, electric_field_zt] = electric_field_photodember()
-% This function returns tt, zz, and electric_field_zt
 
-    % delete any existing parallel pool
-    delete(gcp('nocreate'))
-    
-    % create a new parallel pool with 6 workers
-    parpool(6);
-    
+function [TT, ZZ, electric_field_zt,psi_sub_pd ,...
+    psi_incoherent_pd,eels, w, e_w, t_w, tt, zz] = electric_field_photodember(pulse_energy_experiment_nj,pd_spot_fwhm, pd_z_max)
+
     % set up the eels parameters
-    [eels, w, e_w, t_w_store, tt, zz]= eels_setup();
+    [eels, w, e_w, t_w, tt, zz]= eels_setup(pulse_energy_experiment_nj,pd_spot_fwhm, pd_z_max);
     
     % calculate the photodember interaction voltage
     interact_v_pd_store = utils.eels_pdor(eels,'photodember');
     
-    % shift the interaction voltage by 18 steps along the first dimension
-    interact_v_pd = circshift(interact_v_pd_store, [18,0]);
+
+    interact_v_pd = circshift(interact_v_pd_store, [0,0]);
     
-    % adjust the time window by subtracting 0.2
-    t_w = t_w_store-0.2;
+
+    alpha_pd_0 =  0.05;
     
-    % set the photodember coefficient to 0.07
-    alpha_pd_0 =  0.07;
-    
-    % multiply the interaction voltage by the coefficient
+
     loss_spectrum_parameters.interact_v = interact_v_pd * alpha_pd_0 ;
     
-    % calculate the energy loss spectrum for photodember
+
     [psi_sub_pd , psi_incoherent_pd] = eels.energy_loss_spectrum(loss_spectrum_parameters);
-    
-    % find the maximum of the energy loss spectrum along the second dimension
-    [~, eels_ind_pd] = max(psi_sub_pd,[],2);
-    
-    % find the corresponding excitation energy
-    e_exc_pd = e_w(eels_ind_pd);
-    
-    % create a 2d grid of tt and zz
+
     [TT, ZZ] = ndgrid(tt * 1e12,zz * 1e6);
     
-    % use the derivative_f_dz function to calculate the electric field along z and t
-    electric_field_zt = derivative_f_dz(interact_v_pd_store, zz, tt);
-    
-    % replace any NaN values with zero
+
+    electric_field_zt = utils_spectrum.derivative_f_dz(interact_v_pd_store, zz, tt);
     electric_field_zt(isnan(electric_field_zt)) = 0;
 
 end
 
-function set_axis_properties(ax,FontSize,FontName,LineWidth,YTick,YTickLabel,ylabel_str,xlabel_str,label_FontSize,label_Color)
-    ax.FontSize = FontSize;
-    ax.FontName = FontName;
-    ax.LineWidth = LineWidth;
-    ax.YTick = YTick;
-    if ~isempty(YTickLabel)
-        ax.XTick = YTickLabel;
-    end
-    ylabel(ylabel_str,'Color',label_Color,'FontSize',label_FontSize);
-    xlabel(xlabel_str,'Color',label_Color,'FontSize',label_FontSize);
-end
+function [eels, w, e_w, t_w_store, tt, zz]= eels_setup(pulse_energy_experiment_nj,pd_spot_fwhm, pd_z_max)
 
-
-function [T, Z, ET, t0_vec, eels] = eels_pd(ET, t, z , velec)
-    
-    zmax = 0.5e-4;
-    [T, Z] = ndgrid(t, z);
-
-    t0_vec = (-2:0.02:2);
-    eels = zeros(length(t0_vec),1);
-    ind = 1;
-    for t0 = t0_vec
-    
-        zz_l = (-zmax : 0.1 * zmax: zmax).';
-        tt_l = zz_l / velec + t0;
-        et_l = interp2(T', Z', ET', tt_l, zz_l);
-    %     et_l(isnan(et_l)) = 0;
-        eels(ind) = trapz(zz_l,et_l);
-        ind = ind + 1;
-    end
-    
-    
-    t0_vec = t0_vec.';
-
-
-end
-
-function dfdz = derivative_f_dz(f_values, z_values, t_values)
-    % Check if the input matrices have compatible sizes
-    if size(f_values, 1) ~= length(z_values) || size(f_values, 2) ~= length(t_values)
-        error('Input matrix dimensions do not match with vector sizes.');
-    end
-
-    % Calculate the derivative using the finite difference method
-    dz = z_values(2) - z_values(1); % Assuming uniform grid spacing
-    dfdz = diff(f_values, 1, 1) ./ dz;
-
-    % Pad the dfdz matrix with NaNs to maintain the same size as f_values
-    dfdz = [dfdz; NaN(1, size(dfdz, 2))];
-end
-
-function dfdt = derivative_f_dt(f, z, t)
-% f is a 2d matrix of size m x n, where m is the length of z and n is the length of t
-% z is a vector of size m x 1, containing the values of z
-% t is a vector of size n x 1, containing the values of t
-% ft is a 2d matrix of size m x n, containing the values of ft/dt(z,t)
-
-% initialize ft with zeros
-dfdt = zeros(size(f));
-
-% calculate the constant spacing between t values
-dt = t(2) - t(1);
-
-% use central difference formula to approximate ft/dt(z,t) for each value of t, except the endpoints
-dfdt(:,2:end-1) = (f(:,3:end) - f(:,1:end-2)) / (2 * dt);
-
-% use forward difference formula to approximate ft/dt(z,t) at the first endpoint of t
-dfdt(:,1) = (f(:,2) - f(:,1)) / dt;
-
-% use backward difference formula to approximate ft/dt(z,t) at the last endpoint of t
-dfdt(:,end) = (f(:,end) - f(:,end-1)) / dt;
-
-end
-
-function psi_assemb = assemble_psi_sub(t_w, e_w, eels, psi_sub)
-    psi_assemb = 1;
-
-    eels_w = eels.';
-    eels_w = repmat(eels_w,[1,length(e_w)]);
-
-    e_w_mat = e_w;
-    e_w_mat = abs(repmat(e_w_mat,[length(t_w),1]) - eels_w);
-    
-    [~, b] = min(e_w_mat,[],2);
-    
-    psi_assemb = psi_sub * 0;
-    row = 1;
-    for col = b.'
-        psi_assemb(row,col) = 1;
-        row = row + 1;
-    end
-
-    
-
-end
-
-
-function [eels, w, e_w, t_w_store, tt, zz]= eels_setup()
-%     spot_fwhm = 40e-6;
-%     [laser_parameters,discretization_params, utem_parameters,...
-%         numerical_parameters] = default_parameters_2(spot_fwhm);
+% (TODO: Modify default_parameters)
      [laser_parameters,discretization_params, utem_parameters,...
-        numerical_parameters] = default_parameters_2();
-    
-    laser_parameters.pulse_energy_experiment = 1e-9;
+        numerical_parameters] = default_parameters_2(pd_spot_fwhm);
+
+    laser_parameters.pulse_energy_experiment = 0.1 * pulse_energy_experiment_nj *1e-9;
     discretization_params.l = 1.5e-12 * 3  * discretization_params.fs;
     discretization_params.delay_max = 2 * 1.5e-12;
-    discretization_params.z_max = 30e-6;
+    discretization_params.z_max = pd_z_max;
     
     utem_parameters.electron_total_energy = 0.94;
     laser_parameters.laser_pulse_time_fwhm = 650e-15;
@@ -247,3 +154,49 @@ function [eels, w, e_w, t_w_store, tt, zz]= eels_setup()
     tt = discretization.t;
     zz = discretization.z;
 end
+
+function plot_tile(x, y, z)
+    FontSize = 10;
+    FontName = 'ariel';
+    nexttile
+    imagesc(x, y, z);
+    ylim([-1,1.5]);
+    xlim([-5,5]);
+    colormap jet
+    axis square
+    set_axis_properties(gca,FontSize,FontName,1,[],[],'','',FontSize,[0.3 0.3 0.3]);
+end
+
+function set_axis_properties(ax,FontSize,FontName,LineWidth,YTick,XTick,ylabel_str,xlabel_str,label_FontSize,label_Color)
+    ax.FontSize = FontSize;
+    ax.FontName = FontName;
+%     ax.LineWidth = LineWidth;
+    ax.YTick = YTick;
+
+    ax.XTick = XTick;
+
+    ylabel(ylabel_str,'Color',label_Color,'FontSize',label_FontSize);
+    xlabel(xlabel_str,'Color',label_Color,'FontSize',label_FontSize);
+end
+
+% function [mean_eels, deltat, energy, eels_measure] = get_measurement(angle)
+% 
+% 
+%     [eels_measure, energy,...
+%         time] = measurement_plots.data_measurement(angle);
+%     
+%     deltat = time(time > -1 & time < 1.5);
+%     eels_measure = eels_measure(time > -1 & time < 1.5,:);
+%     
+%     x_c = zeros(1, size(deltat,2));
+%     
+%     eels_measure = eels_measure ./ sqrt(sum(eels_measure.^2, 2));
+%     
+%     
+%     for i = 1:size(eels_measure,1)
+%         [~, ind_max] = max(eels_measure(i,:));
+%         x_c(i) = ind_max;
+%     end
+%     
+%     mean_eels = energy(floor(x_c));
+% end

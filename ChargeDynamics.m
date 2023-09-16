@@ -336,7 +336,7 @@ classdef ChargeDynamics
 
             green_kernel  = ChargeDynamics.calculate_green_kernel(discretization);
             gaussian_laser_spot = exp(-(XPRIME.^2+ZPRIME.^2)./(2*laser.laser_spot_sigma.^2));
-            gaussian_laser_spot(:,:,abs(zprime) > discretization.z_max,:) = 0;
+%             gaussian_laser_spot(:,:,abs(zprime) > discretization.z_max,:) = 0;
 
 
             l_tc = length(t_c_subsampled);

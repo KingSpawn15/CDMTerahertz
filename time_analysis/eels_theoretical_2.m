@@ -16,16 +16,20 @@ ngopt = @(lambda) nopt(lambda) - (lambda)*(nopt(lambda + delta_lambda) - ...
 
 [time_ps, ethz_t, ~, ~] = electric_field_time(lambda, tau, z, d, ngopt, nTHz, nopt, np, omega_max);
 
+% E0 = (1.631e6) * 1.65;
+% ethz_t = ethz_t .* E0;
 velec = 0.7 * 3 * 10^(8-12);
 
-tt_t = time_ps;
+tt_t = time_ps - 0.1;
 
 
 ethz_t = real(ethz_t(tt_t < 10 & tt_t >-10));
 ethz_t = ethz_t/max(ethz_t);
+E0 = (1.631e6) * 1.65;
+ethz_t = ethz_t .* E0;
 tt_t = tt_t(tt_t < 10 & tt_t >-10);
 [T, Z, ET, t0_vec, eels] = eels_calc(ethz_t, tt_t, sigma_z, velec);
-eels = -eels./max(abs(eels));
+% eels = -eels./max(abs(eels));
 
 
 end

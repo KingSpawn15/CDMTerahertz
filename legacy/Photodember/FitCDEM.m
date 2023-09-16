@@ -103,11 +103,11 @@ fprintf('Projected energy FWHM: %.3f [eV]\nProjected time FWHM: %.3f [ps]\n',FWH
 % Phi_OR - Optical Rectificatio
 % Phi_PD - Photo-Dember
 
-Phi_OR = CalcElectricPotential_OpticalRectification_wRetPotential(PulseEnergy,t,z,x0,y0,Theta_Pol,v);
-% Phi_PD = CalcElectricPotential_wXprimeZprimeInt_wRetPotential(PulseEnergy,t,z,x0,y0);
+% Phi_OR = CalcElectricPotential_OpticalRectification_wRetPotential(PulseEnergy,t,z,x0,y0,Theta_Pol,v);
+Phi_PD = CalcElectricPotential_wXprimeZprimeInt_wRetPotential(PulseEnergy,t,z,x0,y0);
 
 %%
-Phi = Phi_OR.*PhiGainFactor;
+Phi = Phi_PD.*PhiGainFactor;
 
 Phi = movmean(movmean(Phi,3,1),10,2);
 
