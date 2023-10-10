@@ -1,17 +1,30 @@
 clear all
 close all
 
+%% Get measurement data
+[com,deltat,energy,eels_measure,errs] = getmeasurement_power();
+%%
+delete(gcp('nocreate'))
+% create a new parallel pool with 6 workers
+parpool(6);
+
 or_spot_sigma = 50e-6;
 pd_spot_fwhm = 40e-6;
 pd_z_max = 90e-6;
-pulse_energy_experiment_nj = 10;
 
-%% Photodember field
 
-[TPD, ZPD, EPD,psi_sub_pd, psi_incoherent_pd, ...
-    eels, w, e_w, t_w, tt, zz] = electric_field_photodember(pulse_energy_experiment_nj, ...
-    pd_spot_fwhm, pd_z_max);
-EPD = EPD*(1.26/6.34);
+%Photodember field
+pulse_energy_list = [0.1000    0.1700    0.3000    0.5200    1.0000    1.7300    3.0000    5.1900   10.0000];
+kfactor = 1.2;
+for ii = 1:length(pulse_energy_list)
+    disp(ii)
+    [TPD, ZPD, EPD{ii},psi_sub_pd{ii}, psi_incoherent_pd{ii}, ...
+        eels, w, e_w, t_w, tt, zz] = electric_field_photodember(pulse_energy_list(ii), ...
+        pd_spot_fwhm, pd_z_max);
+    EPD{ii} = EPD{ii}*(1.26/6.34);
+end
+
+
 
 %% Rectification field
 rectification_param_z0 = -1e-6;
@@ -37,31 +50,139 @@ condition2 = TOR(:,1) > min(TPD(:)) & TOR(:,1) < max(TPD(:));
 EOR1 = EOR(condition1, condition2);
 TOR1 = TOR(condition2, condition1);
 ZOR1 = ZOR(condition2, condition1);
-EORintrap = interp2(TOR1.', ZOR1.', EOR1, TPD.', ZPD.', 'linear', 0);
-EPDintrap = interp2(TPD.', ZPD.', EPD, TOR.', ZOR.', 'linear', 0);
+% EORintrap = interp2(TOR1.', ZOR1.', EOR1, TPD.', ZPD.', 'linear', 0);
+for ii = 1:length(pulse_energy_list)
+    EPDintrap{ii} = interp2(TPD.', ZPD.', kfactor * EPD{ii}, TOR.', ZOR.', 'linear', 0);
+end
 
+ZOR = ZOR .* 1e-6;
+%%
+% ii = 1;
+for ii = 1:length(pulse_energy_list)
+    disp(pulse_energy_list(ii))
+    [t0_vec,eels_comb{ii}] = utils_spectrum.calculate_spectrum_from_fields((0.1 * pulse_energy_list(ii)) * EOR + ...
+        EPDintrap{ii}, TOR, ZOR);
+    psi_incoherent_comb{ii} = eels.incoherent_convolution(utils_spectrum.spectrum_to_coherent_eels(t_w, e_w, eels_comb{ii}, t0_vec),...
+        w, t_w, e_w);
+end
 
 %%
-kfactor = 1.2;
 close all
-setdir = 'figure 1 fields/results/';
+figure;
 FontName = 'ariel';
 FontSize = 10;
+ttt = tiledlayout(3,3,"TileSpacing","compact");
+ttt.Padding = "loose"
+nexttile
+imagesc(energy, deltat - 0.3, eels_measure{1});
+    ylim([-1,1.5]);
+    xlim([-5,5]);
+set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,[],'','',FontSize,[0.3 0.3 0.3])
+    colormap jet
+    axis square
+nexttile;
+imagesc(energy, deltat- 0.3, eels_measure{8});
+    ylim([-1,1.5]);
+    xlim([-5,5]);
+set_axis_properties(gca,FontSize,FontName,1,[],[],'','',FontSize,[0.3 0.3 0.3])
+    colormap jet
+    axis square
+nexttile
+imagesc(energy, deltat- 0.3, eels_measure{9});
+    ylim([-1,1.5]);
+    xlim([-5,5]);
+    set_axis_properties(gca,FontSize,FontName,1,[],[],'','',FontSize,[0.3 0.3 0.3])
+    colormap jet
+    axis square
+nexttile
+imagesc(e_w,t_w, psi_incoherent_comb{1});
+ylim([-1,1.5]);
+xlim([-5,5]);
+colormap jet
+axis square
+set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,-4:2:4,'','',FontSize,[0.3 0.3 0.3])
+nexttile
+imagesc(e_w,t_w, psi_incoherent_comb{8});
+ylim([-1,1.5]);
+xlim([-5,5]);
+colormap jet
+axis square
+set_axis_properties(gca,FontSize,FontName,1,[],-4:2:4,'','',FontSize,[0.3 0.3 0.3])
+nexttile
+imagesc(e_w,t_w, psi_incoherent_comb{9});
+ylim([-1,1.5]);
+xlim([-5,5]);
+colormap jet
+set_axis_properties(gca,FontSize,FontName,1,[],-4:2:4,'','',FontSize,[0.3 0.3 0.3]);
+axis square
+nexttile([1,3]);
+% errors = 0.1 * ones(size(deltat));
+colors = turbo(9);
+for i = 1:1:9
+    plot(eels_comb{i} + 4 * (i-1), t0_vec, 'color', colors(i,:),'LineWidth',1);
+    hold on;
+    errorbar(com(i,2:2:end) + 4 * (i-1), deltat(2:2:end) - 0.3, ...
+       errs(i,2:2:end), 'horizontal',  'color', colors(i,:),'LineStyle','none','LineWidth',.5);
+set(gca, 'YDir', 'reverse');
+    
+end
+hold off
+set_axis_properties(gca,FontSize,FontName,.2,-1:0.2:1.5,0:4:32,'','',FontSize,[0 0 0])
+% axis equal;
+% daspect([1 1 1]);
+ylim([-0.5, 0.5]);
+% xlim([-1,10]);
 
-clim = max(abs(EOR1(:)));
-create_figure_electricfield(TPD + 0.1, ZPD, kfactor * EPD, clim/100, setdir, 'field_photodember.png', FontSize);
-create_figure_electricfield(TOR1+ 0.1, ZOR1, EOR1, clim, setdir, 'field_rectification.png', FontSize);
-create_figure_electricfield(TPD+ 0.1, ZPD, EORintrap + kfactor * EPD, clim, setdir, 'field_combined.png', FontSize);
+set(gcf,'Position',[200,200,200 + 450,200 + 600]); %set paper size (does not affect display)
+
+exportgraphics(gcf, 'figure 2 power/fig2_new.png', 'Resolution',300);
+
 
 %%
 
-function ll = create_line(deltat)
-    c = 3*10^(8 - 12 +6);
-    ve = 0.7*c;
-    z = -100 : 100;
-    t = deltat + z / ve;
-    ll = line(t,z);
+function [com,deltat, energy, eels_measure,errs] = getmeasurement_power()
+    load('saved_matrices\PulseEnergy.mat')
+    deltat = Time;
+    energy = EnergyCrop;
+
+    
+    x_c = zeros(11, size(Time,2));
+    errs = ones(11, size(Time,2));
+
+    for ii = 1:11
+        eels = squeeze(cell2mat(DataSetCropAll(ii)))';
+        eels = eels ./ sqrt(sum(eels.^2, 2));
+        eels_measure{ii} = eels;
+         
+        mass_matrix = eels;
+        % Initialize a vector to store the x coordinates of the center of mass of each row
+%         errs = zeros(1, size(deltat,2));
+        for i = 1:size(eels,1)
+%             row_mass = sum(mass_matrix(i,:));
+            for j = 1:size(eels,2)
+                [~, ind_max] = max(mass_matrix(i,:));
+                x_c(ii,i) = ind_max;
+            end
+            x_c(ii,i) = x_c(ii,i);
+
+            errs(ii,i) = energy(find(mass_matrix(i,:) > 0.7 * max(mass_matrix(i,:)),1,'last')) - ...
+            energy(find(mass_matrix(i,:) >  0.7 * max(mass_matrix(i,:)),1,'first'));
+
+        end
+    end
+
+    com = energy(floor(x_c));
 end
+
+function psi_incoherent = generate_incoherent_spectrum_for_angle(EPD, EOR, TOR, ZOR, eels, w, t_w, e_w, theta)
+    
+    [t0_vec,eels_comb] = utils_spectrum.calculate_spectrum_from_fields(-cos(2 * theta * pi / 180) * EOR + ...
+        EPD, TOR, ZOR);
+    psi_incoherent =  eels.incoherent_convolution(utils_spectrum.spectrum_to_coherent_eels(t_w, e_w, eels_comb, t0_vec),...
+        w, t_w, e_w);
+
+end
+
 
 function create_figure_electricfield(T, Z, E, clim, setdir, filename, FontSize)
     figure;
@@ -71,12 +192,10 @@ function create_figure_electricfield(T, Z, E, clim, setdir, filename, FontSize)
     ylim([-100,100]);
     xticks(-.3:.3:1.5)
     colormap(utils.redblue);
-    pbaspect([1 1 1])
+    pbaspect([2 1 1])
     set(gcf,'position', [200 , 200 , 200 + 150, 200 + 75]);
     colorbar;
-    l0 = create_line(0); l1 = create_line(0.3); l2 = create_line(0.7); 
     exportgraphics(gcf, [setdir, filename],'resolution', 300);
-    
 end
 
 

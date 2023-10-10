@@ -1,6 +1,19 @@
 clear all
 close all
 
+delete(gcp('nocreate'))
+% create a new parallel pool with 6 workers
+parpool(6);
+%% get measurements
+angle = sort([0, 30, 50, 70, 90, 110, 130, 150, 180]);
+
+% [~ ,~, ~, eels_measure_0] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(0));
+for ii = 1:length(angle)
+[~, deltat, energy, eels_measure{ii}] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(angle(ii)));
+end
+
+
+%%
 or_spot_sigma = 50e-6;
 pd_spot_fwhm = 40e-6;
 pd_z_max = 90e-6;
@@ -41,27 +54,62 @@ EORintrap = interp2(TOR1.', ZOR1.', EOR1, TPD.', ZPD.', 'linear', 0);
 EPDintrap = interp2(TPD.', ZPD.', EPD, TOR.', ZOR.', 'linear', 0);
 
 
+ZOR = ZOR .* 1e-6;
 %%
 kfactor = 1.2;
+% ii = 1;
+for ii = 1:length(angle)
+    disp(angle(ii))
+    psi_incoherent_comb{ii} = generate_incoherent_spectrum_for_angle(kfactor * EPDintrap, EOR, TOR, ZOR, eels, w, t_w, e_w, angle(ii));
+   
+end
+
+%%
 close all
-setdir = 'figure 1 fields/results/';
+close all
+setdir = 'figure 4 tiles/results/';
+figure;
+image_name = 'tiles_multiple';
 FontName = 'ariel';
 FontSize = 10;
+ttt = tiledlayout(2,length(angle),"TileSpacing","compact");
+ttt.Padding = "compact";
 
-clim = max(abs(EOR1(:)));
-create_figure_electricfield(TPD + 0.1, ZPD, kfactor * EPD, clim/100, setdir, 'field_photodember.png', FontSize);
-create_figure_electricfield(TOR1+ 0.1, ZOR1, EOR1, clim, setdir, 'field_rectification.png', FontSize);
-create_figure_electricfield(TPD+ 0.1, ZPD, EORintrap + kfactor * EPD, clim, setdir, 'field_combined.png', FontSize);
+for ii = 1:length(angle)
+plot_tile(energy, deltat, eels_measure{ii});
+
+set_axis_properties(gca,FontSize,FontName,0.01,[],[],'','',FontSize,[0 0 0, 0]);
+if ii ==1
+set_axis_properties(gca,FontSize,FontName,0.01,[-1:0.5:1.5],[],'','',FontSize,[0 0 0, 0]);
+end
+
+end
+
+for ii = 1:length(angle)
+plot_tile(e_w,t_w, psi_incoherent_comb{ii});
+set_axis_properties(gca,FontSize,FontName,0.01,[],[],'','',FontSize,[0 0 0, 0]);
+if ii ==1
+set_axis_properties(gca,FontSize,FontName,0.01,[-1:0.5:1.5],[-4:2:4],'','',FontSize,[0 0 0, 0]);
+end
+end
+
+
+set(gcf,'Position',[200,200,200 + 120 * length(angle), 200 +  160]);
+
+
+exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',300);
 
 %%
 
-function ll = create_line(deltat)
-    c = 3*10^(8 - 12 +6);
-    ve = 0.7*c;
-    z = -100 : 100;
-    t = deltat + z / ve;
-    ll = line(t,z);
+function psi_incoherent = generate_incoherent_spectrum_for_angle(EPD, EOR, TOR, ZOR, eels, w, t_w, e_w, theta)
+    
+    [t0_vec,eels_comb] = utils_spectrum.calculate_spectrum_from_fields(-cos(2 * theta * pi / 180) * EOR + ...
+        EPD, TOR, ZOR);
+    psi_incoherent =  eels.incoherent_convolution(utils_spectrum.spectrum_to_coherent_eels(t_w, e_w, eels_comb, t0_vec),...
+        w, t_w, e_w);
+
 end
+
 
 function create_figure_electricfield(T, Z, E, clim, setdir, filename, FontSize)
     figure;
@@ -71,12 +119,10 @@ function create_figure_electricfield(T, Z, E, clim, setdir, filename, FontSize)
     ylim([-100,100]);
     xticks(-.3:.3:1.5)
     colormap(utils.redblue);
-    pbaspect([1 1 1])
+    pbaspect([2 1 1])
     set(gcf,'position', [200 , 200 , 200 + 150, 200 + 75]);
     colorbar;
-    l0 = create_line(0); l1 = create_line(0.3); l2 = create_line(0.7); 
     exportgraphics(gcf, [setdir, filename],'resolution', 300);
-    
 end
 
 

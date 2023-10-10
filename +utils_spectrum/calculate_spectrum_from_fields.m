@@ -1,5 +1,6 @@
 function [t0_vec, eels] = calculate_spectrum_from_fields(EOR, TOR, ZOR)
 
+EOR = EOR.';
 max_z = 50e-6;
 velec = 0.7 * 3 * 10^(8-12);
 
