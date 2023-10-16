@@ -344,7 +344,7 @@ classdef ChargeDynamics
             n_exc = laser.excited_carriers(material.alpha, material.hnew);
             omega_y = material.calculate_omega_y(n_exc, YPRIME, gaussian_laser_spot);
 
-            t_r = (1/C)*sqrt((x0-XPRIME).^2+(y0-YPRIME).^2+(Z-ZPRIME).^2);
+            t_r = 0*(1/C)*sqrt((x0-XPRIME).^2+(y0-YPRIME).^2+(Z-ZPRIME).^2);
 
             alpha = material.alpha;
             gamma = material.gamma;

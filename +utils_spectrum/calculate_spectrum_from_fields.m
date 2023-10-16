@@ -14,7 +14,7 @@ length_t0_vec = length(t0_vec);
 
 parfor ind = 1: length_t0_vec
   
-    et_l = interp2(TOR', ZOR', EOR', electron_t0 + t0_vec(ind), electron_z, "linear",0);
+    et_l = interp2(TOR', ZOR', EOR', electron_t0 - t0_vec(ind), electron_z, "linear",0);
     eels(ind) = trapz(electron_z,et_l);
 
 end

@@ -36,7 +36,7 @@ rectification_param_pulse_laser_spot_sigma = or_spot_sigma;
     rectification_param_z0, ...
     rectification_param_pulse_laser_spot_sigma);
 
-EOR = EOR.';
+EOR = 4 * EOR.';
 ZOR = ZOR .* 1e6;
 
 % Define the conditions
@@ -50,47 +50,57 @@ ZOR1 = ZOR(condition2, condition1);
 EORintrap = interp2(TOR1.', ZOR1.', EOR1, TPD.', ZPD.', 'linear', 0);
 EPDintrap = interp2(TPD.', ZPD.', EPD, TOR.', ZOR.', 'linear', 0);
 
-%%
+
 EPDintrap = interp2(TPD.', ZPD.', EPD, TOR.', ZOR.', 'linear', 0);
 
-%%
+
 ZOR = ZOR .* 1e-6;
-
+TOR_store = TOR;
 %%
-kfactor = 1.2;
-psi_incoherent_pd = generate_incoherent_spectrum_for_angle(kfactor * EPDintrap, 0 * EOR, TOR, ZOR, eels, w, t_w, e_w, 0);
-psi_incoherent_or_0 = generate_incoherent_spectrum_for_angle(kfactor *0 * EPDintrap, EOR, TOR, ZOR, eels, w, t_w, e_w, 0);
-psi_incoherent_or_90 = generate_incoherent_spectrum_for_angle(kfactor *0 * EPDintrap, EOR, TOR, ZOR, eels, w, t_w, e_w, 90);
-psi_incoherent_comb_0 = generate_incoherent_spectrum_for_angle(kfactor *EPDintrap, EOR, TOR, ZOR, eels, w, t_w, e_w, 0);
-psi_incoherent_comb_90 = generate_incoherent_spectrum_for_angle(kfactor *EPDintrap, EOR, TOR, ZOR, eels, w, t_w, e_w, 90);
-
-setdir = 'figure 4 tiles/results/';
-close all
-close all
-figure;
-image_name = 'tiles';
-FontName = 'ariel';
-FontSize = 10;
-ttt = tiledlayout(2,4,"TileSpacing","compact");
-ttt.Padding = "loose";
-
-plot_tile(energy, deltat, eels_measure_0);
-set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,[],'','',FontSize,[0.3 0.3 0.3]);
-plot_tile(e_w,t_w, psi_incoherent_comb_0);
-plot_tile(e_w,t_w, psi_incoherent_pd);
-plot_tile(e_w,t_w, psi_incoherent_or_0);
-plot_tile(energy, deltat, eels_measure_90);
-set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,-4:2:4,'','',FontSize,[0.3 0.3 0.3]);
-plot_tile(e_w,t_w, psi_incoherent_comb_90);
-set_axis_properties(gca,FontSize,FontName,0.01,[],[],'','',FontSize,[0 0 0, 0]);
-plot_tile(e_w,t_w, psi_incoherent_pd);
-plot_tile(e_w,t_w, psi_incoherent_or_90);
-
-set(gcf,'Position',[200,200,200 + 2 * 300,200 +  300]); %set paper size (does not affect display)
 
 
-exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',300);
 
+for kfactor_or = 0.4:0.1:0.7
+for time_shift = -0.2
+    TOR = TOR_store - time_shift;
+    EPDintrap = interp2(TPD.', ZPD.', EPD, TOR.', ZOR.' * 1e6, 'linear', 0);
+    
+    kfactor = 1.2;
+    psi_incoherent_pd = generate_incoherent_spectrum_for_angle(kfactor * EPDintrap, 0 * kfactor_or*EOR, TOR, ZOR, eels, w, t_w, e_w, 0);
+    psi_incoherent_or_0 = generate_incoherent_spectrum_for_angle(kfactor *0 * EPDintrap, kfactor_or*EOR, TOR, ZOR, eels, w, t_w, e_w, 0);
+    psi_incoherent_or_90 = generate_incoherent_spectrum_for_angle(kfactor *0 * EPDintrap, kfactor_or*EOR, TOR, ZOR, eels, w, t_w, e_w, 90);
+    psi_incoherent_comb_0 = generate_incoherent_spectrum_for_angle(kfactor *EPDintrap, kfactor_or*EOR, TOR, ZOR, eels, w, t_w, e_w, 0);
+    psi_incoherent_comb_90 = generate_incoherent_spectrum_for_angle(kfactor *EPDintrap, kfactor_or*EOR, TOR, ZOR, eels, w, t_w, e_w, 90);
+    
+    setdir = 'figure 4 tiles/results/';
+    close all
+    close all
+    figure;
+    image_name = strcat('instant_tiles_shift=',num2str(time_shift),'_efactor',num2str(kfactor_or));
+    FontName = 'ariel';
+    FontSize = 10;
+    ttt = tiledlayout(2,4,"TileSpacing","compact");
+    ttt.Padding = "loose";
+    
+    plot_tile(energy, deltat, eels_measure_0);
+    set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,[],'','',FontSize,[0.3 0.3 0.3]);
+    plot_tile(e_w,t_w, psi_incoherent_comb_0);
+    plot_tile(e_w,t_w, psi_incoherent_pd);
+    plot_tile(e_w,t_w, psi_incoherent_or_0);
+    plot_tile(energy, deltat, eels_measure_90);
+    set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,-4:2:4,'','',FontSize,[0.3 0.3 0.3]);
+    plot_tile(e_w,t_w, psi_incoherent_comb_90);
+    set_axis_properties(gca,FontSize,FontName,0.01,[],[],'','',FontSize,[0 0 0, 0]);
+    plot_tile(e_w,t_w, psi_incoherent_pd);
+    plot_tile(e_w,t_w, psi_incoherent_or_90);
+    
+    set(gcf,'Position',[200,200,200 + 2 * 300,200 +  300]); %set paper size (does not affect display)
+    
+    
+    exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',300);
+
+end
+end
 %%
 
 function psi_incoherent = generate_incoherent_spectrum_for_angle(EPD, EOR, TOR, ZOR, eels, w, t_w, e_w, theta)

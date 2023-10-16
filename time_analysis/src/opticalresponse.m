@@ -64,18 +64,20 @@ classdef opticalresponse
             ninf = 3.5;
 
             eps_inf = ninf^2;
-%             gamma_LO = 2 * pi * Ccm * 2.01;
-%             gamma_TO = 2 * pi * Ccm * 8.67;
-            gamma_LO = 2 * pi * Ccm * 4.01;
-            gamma_TO = 2 * pi * Ccm * 4.01;
-            omega_p = 78.1e12;
+            gamma_LO = 2 * pi * Ccm * 2.01;
+            gamma_TO = 2 * pi * Ccm * 8.67;
+%             gamma_LO = 2 * pi * Ccm * 4.01;
+%             gamma_TO = 2 * pi * Ccm * 4.01;
+            omega_p = 78.1e12 / sqrt(5);
 %             gammaD = (1/125e-15);
             gammaD = 1.7e12;
             background =  eps_inf .* (omega_LO^2 - omega.^2 - 1i * gamma_LO .* omega) ./ ...
                 (omega_TO^2 - omega.^2 - 1i * gamma_TO .* omega);
 
-            drude = - 1 .* omega_p^2./(omega.*(omega + 1i*(1/gammaD)));
+            drude = - eps_inf .* omega_p^2./(omega.*(omega + 1i*(1/gammaD)));
             nTHz = sqrt(background + drude);
+            nThz_im = imag(nTHz);
+            nTHz(nThz_im < 0) = -nTHz(nThz_im < 0);
         end
 
     
