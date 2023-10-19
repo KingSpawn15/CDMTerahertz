@@ -65,6 +65,23 @@ classdef UTEMElectron < handle
             w = w';
         end
         
+        function w = incoherent_gaussian_blurring_window(self, e_w, t_w)
+            
+%             e_w = energy(1:sub_sample_factor:end);
+%             t_w = deltat*1e12;%[ps]
+            
+            sigma_t = self.electron_time_incoherent_sigma*1e12;
+            sigma_e= self.electron_energy_incoherent_sigma;
+            
+            a = cos(self.electron_theta)^2/(2*sigma_t^2) + sin(self.electron_theta)^2/(2*sigma_e^2);
+            b = (sin(2*self.electron_theta)/4)*((1/sigma_e^2)-(1/sigma_t^2));
+            c = sin(self.electron_theta)^2/(2*sigma_t^2) + cos(self.electron_theta)^2/(2*sigma_e^2);
+            
+            [TW,EW] = meshgrid(t_w,e_w);
+            w = exp(-(a*TW.^2 + 2*b*TW.*EW + c*EW.^2));
+            w = w';
+        end
+
     end
     
     methods(Static)
