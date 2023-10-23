@@ -6,7 +6,7 @@ velec = 0.7 * 3 * 10^(8-12);
 
 electron_z = (-5 : 0.1: 5).' .* max_z;
 electron_t0 = electron_z / velec;
-t0_vec = (-5:0.02:5).';
+t0_vec = (-3:0.02:3).';
 eels = zeros(length(t0_vec),1);
 
 
