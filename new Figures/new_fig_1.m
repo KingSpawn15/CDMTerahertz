@@ -8,9 +8,10 @@ e_w = fields.e_w ;
 T = fields.T ;
 Z = fields.Z ;
 eels_photodember = fields.eels_obj;
-
+%%
+close all;
 FontName = 'ariel';
-FontSize = 10;
+FontSize = 15;
 clim  = max(abs(EOR(:)));
 setdir = 'new Figures/results/';
 create_figure_electricfield(T, Z, EPD, clim/100, setdir, 'field_photodember.png', FontSize);
@@ -50,16 +51,22 @@ end
 function create_figure_electricfield(T, Z, E, clim, setdir, filename, FontSize)
     figure;
     imagesc(T(:,1), Z(1,:), E, [-clim, clim]);
+%     h = gcf();
+%     h.Renderer = "painters";
     set(gca,'FontSize',FontSize);
     xlim([-.3,1.5]);
     ylim([-100,100]);
     xticks(-.3:.3:1.5)
     colormap(utils.redblue);
     pbaspect([1 1 1])
-    set(gcf,'position', [200 , 200 , 200 + 150, 200 + 75]);
+    set(gcf,'position', [200 , 200 , 200 + 200, 200 + 120]);
     colorbar;
     l0 = create_line(0); l1 = create_line(0.3); l2 = create_line(0.7); 
+
+    set(groot,'defaultAxesXTickLabelRotationMode','manual');
     exportgraphics(gcf, [setdir, filename],'resolution', 300);
+%     print(h,'-vector', '-dsvg', [setdir, filename]) 
+%     saveas(h, [setdir, filename],'resolution', 300) 
     
 end
 
@@ -133,4 +140,5 @@ function set_axis_properties(ax,FontSize,FontName,LineWidth,YTick,XTick,ylabel_s
 
     ylabel(ylabel_str,'Color',label_Color,'FontSize',label_FontSize);
     xlabel(xlabel_str,'Color',label_Color,'FontSize',label_FontSize);
+%     axes tight;
 end

@@ -15,3 +15,5 @@ examples/New Folder/to_delete.m
 saved_matrices/v_struct.mat
 *.mp4
 *.avi
+*.pdf
+*.svg

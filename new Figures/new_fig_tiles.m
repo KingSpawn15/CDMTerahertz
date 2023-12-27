@@ -28,7 +28,7 @@ close all
 figure;
 image_name = 'tiles';
 FontName = 'ariel';
-FontSize = 10;
+FontSize = 16;
 ttt = tiledlayout(2,4,"TileSpacing","compact");
 ttt.Padding = "loose";
 
@@ -51,7 +51,7 @@ exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',300);
 
 %%
 function plot_tile(x, y, z)
-    FontSize = 10;
+    FontSize = 18;
     FontName = 'ariel';
     nexttile
     imagesc(x, y, z);
@@ -59,7 +59,9 @@ function plot_tile(x, y, z)
     xlim([-5,5]);
     colormap jet
     axis square
+    set(groot,'defaultAxesXTickLabelRotationMode','manual');
     set_axis_properties(gca,FontSize,FontName,1,[],[],'','',FontSize,[0.3 0.3 0.3]);
+    
 end
 
 function set_axis_properties(ax,FontSize,FontName,LineWidth,YTick,XTick,ylabel_str,xlabel_str,label_FontSize,label_Color)

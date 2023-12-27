@@ -120,11 +120,13 @@ axis square
 nexttile([1,3]);
 % errors = 0.1 * ones(size(deltat));
 colors = turbo(9);
+
+ERROR_VAL = 0.94/2;
 for i = 1:1:9
     plot(eels_comb{i} + 4 * (i-1), t0_vec, 'color', colors(i,:),'LineWidth',1);
     hold on;
     errorbar(com(i,2:2:end) + 4 * (i-1), deltat(2:2:end) - 0.3, ...
-       errs(i,2:2:end), 'horizontal',  'color', colors(i,:),'LineStyle','none','LineWidth',.5);
+       ERROR_VAL + 0*errs(i,2:2:end), 'horizontal',  'color', colors(i,:),'LineStyle','none','LineWidth',.5);
 set(gca, 'YDir', 'reverse');
     
 end
@@ -137,7 +139,7 @@ xlim([-4,40]);
 
 set(gcf,'Position',[200,200,200 + 450,200 + 600]); %set paper size (does not affect display)
 
-exportgraphics(gcf, 'new Figures/power_fig.png', 'Resolution',300);
+exportgraphics(gcf, 'new Figures/power_fig_errors.png', 'Resolution',300);
 
 %%
 function [com,deltat, energy, eels_measure,errs] = getmeasurement_power()

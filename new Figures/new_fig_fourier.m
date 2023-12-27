@@ -64,7 +64,7 @@ spectra_theory = real(spectra_theory) ./ max(abs(real(spectra_theory(:))));
 close all
 setdir = 'new Figures/results/';
 FontName = 'ariel';
-FontSize = 14;
+FontSize = 18;
 dt_arr = -0.1;
 
 % plot max eels experiment
@@ -75,7 +75,7 @@ xlim([-0.5,1.1]);
 colormap(my_redblue);
 hold on;
 for dt = dt_arr
-plot(dt * ones(length(0:2:180),1), angle,'LineWidth',2,'LineStyle','-.','Color',[1 1 1]);
+plot(dt * ones(length(0:2:180),1), angle,'LineWidth',2,'LineStyle','-.','Color','#FF00FF');
 end
 set_axis_properties(gca,FontSize,FontName,1,0:30:180,-1:0.5:1.5,'','',FontSize,[0 0 0]);
 set(gcf,'Position',[200,200,200 + 150,200 +  150]); 
@@ -89,7 +89,7 @@ xlim([-0.5,1.1]);
 colormap(my_redblue);
 hold on;
 for dt = dt_arr
-plot(dt * ones(length(0:2:180),1), angle,'LineWidth',2,'LineStyle','-.','Color',[1 1 1]);
+plot(dt * ones(length(0:2:180),1), angle,'LineWidth',2,'LineStyle','-.','Color','#FF00FF');
 end
 set_axis_properties(gca,FontSize,FontName,1,0:30:180,-1:0.5:1.5,'','',FontSize,[0 0 0]);
 set(gcf,'Position',[200,200,200 + 150,200 +  150]); 
@@ -118,7 +118,7 @@ hold on
 ii = 1;
 for dt = dt_arr
     [~,ind_0] = min(abs(t0_vec  - dt));
-    plot(mean_eels_sim(:,ind_0),0:2:180,LineWidth=3,Color=[0.8 0 0]);
+    plot(mean_eels_sim(:,ind_0),0:2:180,LineWidth=3,Color='#FF00FF');
 end
 set_axis_properties(gca,FontSize,FontName,2,0:30:180,-4:2:4,'','',FontSize,[0 0 0]);
 xlim([-5,5]);
@@ -194,7 +194,27 @@ set_axis_properties(gca,FontSize,FontName,2,0:0.2:1,0:0.5:2.5,'','',FontSize,[0 
 set(gcf,'Position',[200,200,200 + 150,200 +  150]); 
 box on;
 exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',300);
+%%
+close all
+FontSize = 18;
+image_name = 'colorbar_fourier';
+figure;
+imagesc([0 1])
+colormap("jet")
+colorbar('eastoutside','Ticks',[0 0.5 1]);
+set_axis_properties(gca,FontSize,FontName,2,0:0.2:1,0:0.5:2.5,'','',FontSize,[0 0 0]);
+set(gcf,'Position',[200,200,200 + 150,200 +  150]); 
+exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',300);
 
+
+image_name = 'colorbar_shift';
+figure;
+imagesc([-1 3])
+colormap(my_redblue)
+colorbar('eastoutside','Ticks',[-1 :1: 3]);
+set_axis_properties(gca,FontSize,FontName,2,0:0.2:1,0:0.5:2.5,'','',FontSize,[0 0 0]);
+set(gcf,'Position',[200,200,200 + 150,200 +  150]); 
+exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',300);
 %%
 function [f, spectra] = builder_spectra(psi, energy, time)
 
@@ -250,4 +270,5 @@ function set_axis_properties(ax,FontSize,FontName,LineWidth,YTick,XTick,ylabel_s
 
     ylabel(ylabel_str,'Color',label_Color,'FontSize',label_FontSize);
     xlabel(xlabel_str,'Color',label_Color,'FontSize',label_FontSize);
+    set(groot,'defaultAxesXTickLabelRotationMode','manual');
 end

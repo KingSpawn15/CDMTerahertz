@@ -18,7 +18,7 @@ function fields = optimal_parameters()
     params_rectification.sigma_z = 50e-6;
     params_rectification.z = -1e-6;
     E_max_rectification = (1.631e6) * 1.65;
-    delay_or_pd_ps = 0.05;
+    delay_or_pd_ps = 0.1;
     
     % photodember field calculation
     eels_photodember = setup_parameters_eels_photodember(pump_power_nj, laser_spot_size_fwhm);
