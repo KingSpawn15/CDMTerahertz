@@ -30,7 +30,8 @@ function [TOR, ZOR, EOR] = electric_field_rectification(params_rectification, E_
     tt_t = tt_t(tt_t < 10 & tt_t >-10);
     vec_z = (-20 : 0.05 : 20 ).'*sigma_z;
 
-    ethz_t = ethz_t/max(ethz_t);
+%     ethz_t = ethz_t/max(ethz_t);
+    ethz_t = ethz_t/1.5884e-10;
 %     E_max_rectification = (1.631e6) * 1.65;
     
     ethz_t = ethz_t .* E_max_rectification;
