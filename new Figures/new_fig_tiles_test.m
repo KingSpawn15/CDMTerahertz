@@ -8,14 +8,20 @@ e_w = fields.e_w ;
 T = fields.T ;
 Z = fields.Z ;
 eels_photodember = fields.eels_obj;
+%% Kfir 
+
+
+EOR_k =  kfir_near_field((T.') * 1e-12, (Z.') * 1e-6, 50e-15, 1e-6);
+
+
 %% Get measurement data
 
 [~ ,~, ~, eels_measure_0] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(0));
 [~, ~, ~, eels_measure_45] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(45));
 [~, deltat, energy, eels_measure_90] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(90));
 
-EOR = EOR * 1.1;
-%%
+EOR = EOR_k * 1e-6;
+
 [e_w, t_w, psi_incoherent_pd] = utils_spectrum.generate_incoherent_spectrum_for_angle(EPD, 0 * EOR, T, Z, 45, eels_photodember, e_w);
 [~, ~, psi_incoherent_or_0] = utils_spectrum.generate_incoherent_spectrum_for_angle(0 * EPD, EOR, T, Z, 0, eels_photodember, e_w);
 [~, ~, psi_incoherent_or_45] = utils_spectrum.generate_incoherent_spectrum_for_angle(0 * EPD, EOR, T, Z, 45, eels_photodember, e_w);
@@ -24,7 +30,7 @@ EOR = EOR * 1.1;
 [~, ~, psi_incoherent_comb_45] = utils_spectrum.generate_incoherent_spectrum_for_angle(EPD, EOR, T, Z, 45, eels_photodember, e_w);
 [~, ~, psi_incoherent_comb_90] = utils_spectrum.generate_incoherent_spectrum_for_angle(EPD, EOR, T, Z, 90, eels_photodember, e_w);
 
-%%
+
 setdir = 'new Figures/results/';
 close all
 close all
