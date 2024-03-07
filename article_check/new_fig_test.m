@@ -1,6 +1,7 @@
 clear all
 close all
 
+
 fields = optimal_parameters();
 EOR = fields.EOR;
 EPD = fields.EPD;
@@ -13,13 +14,15 @@ close all;
 FontName = 'ariel';
 FontSize = 15;
 clim  = max(abs(EOR(:)));
-setdir = 'new Figures/results/';
+setdir = 'article_check/results/';
 section_or = 401;
 section_pd = 412;
 create_figure_electricfield(T, Z, EPD, clim/100, setdir, 'field_photodember.png', ...
     FontSize,section_pd);
 create_figure_electricfield(T, Z, EOR, clim, setdir, 'field_rectification.png', ...
     FontSize,section_or);
+%%
+
 
 %% create figure section OR
 close all

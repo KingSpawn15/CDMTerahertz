@@ -96,7 +96,8 @@ deltaz = z(2)-z(1);
 
 %% Scan parameters
 % PulseEnergy = PulseEnergyGainFactor.*[0.017,0.030,0.054,0.100,0.170,0.300,0.540,1.000,1.770,3.000,5.400,10.000].*1e-9;%[J]
-PulseEnergy = PulseEnergyGainFactor.*[0.01:0.02:0.1, 0.2:0.2:1, 1.5:0.5:10].*1e-9;%[J]
+% PulseEnergy = PulseEnergyGainFactor.*[0.01:0.02:0.1, 0.2:0.2:1, 1.5:0.5:10].*1e-9;%[J]
+PulseEnergy = PulseEnergyGainFactor.*[10].*1e-9;%[J]
 Length = length(PulseEnergy);
 
 x0 = 0;
@@ -257,24 +258,24 @@ for PulseEnergyInd = 1:Length%ExpInd
     TimeScan_Model_HR_All(PulseEnergyInd,:,:) = TimeScan_Model_HR;
     
     %% Plot
-%     figure(400 + PulseEnergyInd)
-%     subplot(1,2,1)
-%     imagesc(eW,tW,TimeScan_Model_HR)
-%     title('\psi_{Model}','FontWeight','Normal')
-%     xlabel('Energy [eV]')
-%     ylabel('\Deltat [ps]')
-%     xlim([-3 3])
-%     ylim([-0.5 1.2])
-%     colorbar
-%     colormap jet
-%     axis square
-%     drawnow
-%     box on
-%     ax = gca;
-%     ax.LineWidth = 2;
-%     ax.FontSize = 18;
-%     ax.XTick = -3:1.5:3;
-%     ax.YTick = -0.5:0.5:1;
+    figure(400 + PulseEnergyInd)
+    subplot(1,2,1)
+    imagesc(eW,tW,TimeScan_Model_HR)
+    title('\psi_{Model}','FontWeight','Normal')
+    xlabel('Energy [eV]')
+    ylabel('\Deltat [ps]')
+    xlim([-3 3])
+    ylim([-0.5 1.2])
+    colorbar
+    colormap jet
+    axis square
+    drawnow
+    box on
+    ax = gca;
+    ax.LineWidth = 2;
+    ax.FontSize = 18;
+    ax.XTick = -3:1.5:3;
+    ax.YTick = -0.5:0.5:1;
 % 
 %     subplot(1,2,2)
 %     imagesc(Energy_Experiment,TimeDelay_Experiment,TimeScan_Experiment)
