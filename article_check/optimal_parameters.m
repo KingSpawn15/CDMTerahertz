@@ -1,6 +1,6 @@
 function fields = optimal_parameters()
     delete(gcp('nocreate'));
-    parpool(6);
+    parpool(28);
     
     % miscellaneous params
     e_w = linspace(-5,5,181);
