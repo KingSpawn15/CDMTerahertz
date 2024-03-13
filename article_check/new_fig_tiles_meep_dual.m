@@ -2,26 +2,28 @@ clearvars -except TPD_non_interpolated ZPD_non_interpolated EPD_non_interpolated
 close all
 
 %  photodember_parameters
-delete(gcp('nocreate'));
-parpool(28)
-pump_power_nj = 10;
-laser_spot_size_fwhm = 40e-6;
-fitting_parameter_EPD = (1.26/6.34) * 1.2;
-eels_photodember = setup_parameters_eels_photodember(pump_power_nj, laser_spot_size_fwhm);
-[TPD_non_interpolated, ZPD_non_interpolated, EPD_non_interpolated] = electric_field_photodember(eels_photodember, fitting_parameter_EPD);
+% delete(gcp('nocreate'));
+% parpool(28)
+% pump_power_nj = 10;
+% laser_spot_size_fwhm = 40e-6;
+% fitting_parameter_EPD = (1.26/6.34) * 1.2;
+% eels_photodember = setup_parameters_eels_photodember(pump_power_nj, laser_spot_size_fwhm);
+% [TPD_non_interpolated, ZPD_non_interpolated, EPD_non_interpolated] = electric_field_photodember(eels_photodember, fitting_parameter_EPD);
 %%
 spot_size = 80;
 shift = 0.58 ;
-weight = 2.5 * (30/50)^(5/2);
+weight = 1 * (30/50)^(5/2);
 fields = optimal_parameters_dual(weight, spot_size, shift, TPD_non_interpolated, ZPD_non_interpolated, ...
     EPD_non_interpolated, eels_photodember);
-EOR_0 = fields.EOR_0 ;
+EOR_0 = -fields.EOR_90 ;
 EOR_90 = fields.EOR_90 ;
 EPD = fields.EPD * 1.2;
 e_w = fields.e_w ;
 T = fields.T ;
 Z = fields.Z ;
 eels_photodember = fields.eels_obj;
+%%
+
 %% Get measurement data
 
 [~ ,~, ~, eels_measure_0] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(0));
@@ -49,7 +51,7 @@ setdir = 'article_check/results/';
 close all
 close all
 figure;
-image_name = 'tiles_test_pd';
+image_name = 'tiles_test_meep';
 FontName = 'ariel';
 FontSize = 14;
 ttt = tiledlayout(3,4,"TileSpacing","compact");
@@ -80,7 +82,16 @@ set(gcf,'Position',[200,200,200 + 3 * 300,200 +  400]); %set paper size (does no
 
 exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',300);
 %%
-
+close all;
+FontName = 'ariel';
+FontSize = 15;
+clim  = max(abs(EOR_90(:)));
+% section_or = 401;
+% section_pd = 412;
+% create_figure_electricfield(T, Z, EPD, clim/100, setdir, 'field_photodember.png', ...
+%     FontSize,section_pd);
+create_figure_electricfield(T + 0.2, Z, EOR_90, clim, setdir, 'field_rectification_meep.png', ...
+    FontSize);
 
 %%
 function plot_tile(x, y, z)
@@ -109,3 +120,30 @@ function set_axis_properties(ax,FontSize,FontName,LineWidth,YTick,XTick,ylabel_s
     xlabel(xlabel_str,'Color',label_Color,'FontSize',label_FontSize);
 end
 
+function create_figure_electricfield(T, Z, E, clim, setdir, filename, FontSize, section)
+    figure;
+    imagesc(T(:,1), Z(1,:), E, [-clim, clim]);
+%     h = gcf();
+%     h.Renderer = "painters";
+    set(gca,'FontSize',FontSize);
+    xlim([-.3,1.5]);
+    ylim([-100,100]);
+    xticks(-.3:.3:1.5)
+    colormap(utils.redblue);
+    pbaspect([1 1 1])
+    set(gcf,'position', [200 , 200 , 200 + 200, 200 + 120]);
+    colorbar;
+%     l0 = create_line(0); l1 = create_line(0.3); l2 = create_line(0.7); 
+%     
+    if nargin>7
+        hold on
+        xx = T(:,1); yyor = Z(:,section);
+        plot(xx,yyor,LineStyle="--",Color='#808080',LineWidth=1)
+    end
+
+    set(groot,'defaultAxesXTickLabelRotationMode','manual');
+    exportgraphics(gcf, [setdir, filename],'resolution', 300);
+%     print(h,'-vector', '-dsvg', [setdir, filename]) 
+%     saveas(h, [setdir, filename],'resolution', 300) 
+    
+end

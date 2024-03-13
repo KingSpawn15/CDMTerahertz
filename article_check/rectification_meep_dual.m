@@ -1,5 +1,5 @@
 function [tc, xc, field_laser_profile_0, field_laser_profile_90] = rectification_meep_dual(spot_size_fwhm)
-    load('article_check/saved_matrices_meep/set14/field_ez50.0_fs.mat')
+    load('article_check/saved_matrices_meep/set11/field_ez50.0_fs.mat')
     
     %%
 %     close all
@@ -19,6 +19,7 @@ function [tc, xc, field_laser_profile_0, field_laser_profile_90] = rectification
 end
 
 %%
+
 function field_laser_profile = convolve_laser_profile(field, xc, spot_size_fwhm)
     
     sigma = spot_size_fwhm / sqrt(8 * log(2));

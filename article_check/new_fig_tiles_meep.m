@@ -3,12 +3,12 @@ close all
 
  % photodember_parameters
 % delete(gcp('nocreate'));
-% parpool(6)
-% pump_power_nj = 10;
-% laser_spot_size_fwhm = 40e-6;
-% fitting_parameter_EPD = (1.26/6.34) * 1.2;
-% eels_photodember = setup_parameters_eels_photodember(pump_power_nj, laser_spot_size_fwhm);
-% [TPD_non_interpolated, ZPD_non_interpolated, EPD_non_interpolated] = electric_field_photodember(eels_photodember, fitting_parameter_EPD);
+parpool(28)
+pump_power_nj = 10;
+laser_spot_size_fwhm = 40e-6;
+fitting_parameter_EPD = (1.26/6.34) * 1.2;
+eels_photodember = setup_parameters_eels_photodember(pump_power_nj, laser_spot_size_fwhm);
+[TPD_non_interpolated, ZPD_non_interpolated, EPD_non_interpolated] = electric_field_photodember(eels_photodember, fitting_parameter_EPD);
 %%
 spot_size = 80;
 shift = 0.6 ;
@@ -44,7 +44,7 @@ setdir = 'article_check/results/';
 close all
 close all
 figure;
-image_name = 'tiles_test_pd';
+image_name = 'tiles_check_meep';
 FontName = 'ariel';
 FontSize = 14;
 ttt = tiledlayout(3,4,"TileSpacing","compact");
