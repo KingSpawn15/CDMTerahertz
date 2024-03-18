@@ -1,9 +1,10 @@
 clear all 
 close all
+%%
+delete(gcp('nocreate'));
+parpool(6);
 
-% delete(gcp('nocreate'));
-% parpool(28);
-
+%%
 % miscellaneous params
 e_w = linspace(-5,5,181);
 
@@ -73,6 +74,8 @@ for ii = 1:length(pulse_energy_list)
 end
 
 
+%%
+[com_sim,errs_sim] = get_errors_sim(psi_incoherent_comb, e_w, t_w);
 %%
 close all
 figure;
@@ -166,14 +169,21 @@ ERROR_VAL = 0;
 
 ind = 1;
 for i = [2     4     6     8     9    10  11]
-    plot(eels_comb{i} + 5 * (ind-1), t0_vec, 'color', colors(i,:),'LineWidth',1);
-    hold on;
+%     plot(eels_comb{i} + 5 * (ind-1), t0_vec, 'color', colors(i,:),'LineWidth',1);
     
-    [errorx, errory] = errorband(com_2(i,:) + 5 *  (ind-1), errs(i,:), deltat - 0.3);
+% errorbar(com(i,2:3:end) + 5 * (ind-1), t_w(2:3:end),errs_sim(i,2:3:end)/2, 'horizontal','color', ...
+%         colors(i,:),'LineWidth',.5,'LineStyle','none');
+%     hold on;
+    
+%     [errorx, errory] = errorband(com(i,:) + 5 *  (ind-1), errs(i,:), deltat - 0.3);
+
+    [errorx, errory] = errorband(com_sim(i,:) + 5 *  (ind-1), errs_sim(i,:), t_w');
     fill(errorx, errory,  colors(i,:),'FaceAlpha',0.3,'EdgeColor','none');
 
-%     errorbar(com(i,2:2:end) + 5 *  (ind-1), deltat(2:2:end) - 0.3, ...
-%        ERROR_VAL + 1*errs(i,2:2:end)/2, 'horizontal',  'color', colors(i,:),'LineStyle','-','LineWidth',.5);
+    hold on;
+    errorbar(com(i,2:2:end) + 5 *  (ind-1), deltat(2:2:end) - 0.3, ...
+       ERROR_VAL + 1*errs(i,2:2:end)/2, 'horizontal',  'color', colors(i,:),'LineStyle','None','LineWidth',.5);
+
 set(gca, 'YDir', 'reverse');
     ind = ind + 1
 end
@@ -182,13 +192,13 @@ set_axis_properties(gca,FontSize,FontName,.2,-1:0.5:1.5,0:5:30,'','',FontSize,[0
 % axis equal;
 % daspect([1 1 1]);
 ylim([-1, 1]);
-xlim([-4,40]);
+xlim([-4,35]);
 set(gca,'XAxisLocation','top')
 
 
 set(gcf,'Position',[200,50,200 + 600,200 + 600]); %set paper size (does not affect display)
 
-exportgraphics(gcf, 'article_check/results/power_fig_errors_all_saturation_option_1.png', 'Resolution',300);
+exportgraphics(gcf, 'article_check/results/power_fig_4.png', 'Resolution',300);
 %%
 % error analysis figure
 close all
@@ -346,6 +356,27 @@ function [com,deltat, energy, eels_measure,errs] = getmeasurement_power()
     com = energy(floor(x_c));
 end
 
+
+function [com,errs] = get_errors_sim(eels_sim, e_w, t_w)
+        
+    com = zeros(11, size(t_w,1));
+    errs = ones(11, size(t_w,1));
+    
+    for ii = 1:11
+        eels = eels_sim{ii};
+        eels = eels ./ sqrt(sum(eels.^2, 2));
+        [errs_i,means_i] = error_calculator(eels,e_w);
+
+        com(ii,:) = means_i;
+        errs(ii,:) = errs_i;
+    
+    end
+
+end
+
+
+
+
 function [com,deltat, energy, eels_measure,errs] = getmeasurement_power_2()
     load('saved_matrices\PulseEnergy.mat')
     
@@ -362,8 +393,8 @@ function [com,deltat, energy, eels_measure,errs] = getmeasurement_power_2()
         [errs_i,means_i] = error_calculator(eels,energy);
 
         eels_measure{ii} = eels;
-        com(ii,:) = means_i
-        errs(ii,:) = errs_i
+        com(ii,:) = means_i;
+        errs(ii,:) = errs_i;
     
     end
 % 
