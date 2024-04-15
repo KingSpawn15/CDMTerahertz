@@ -18,7 +18,34 @@ setdir = 'new Figures/results/';
 create_figure_electricfield(T+.1, Z, EOR, clim, setdir, 'field_rectification.png', FontSize);
 create_figure_electricfield(T+.1, Z, movmean(movmean(EPD,5,2),2,1), clim_pd, setdir, 'field_photodember.png', FontSize);
 
+%%
+close all
+figure;
+plot(T(:,1), EOR(401,:),'Color','#00008B','LineWidth',1)
+xlim([-0.3,1.5]); %ylim([-3,3]*1e6)
+tau = 30e-15 * 1e12;
+intensity = @(t,maxI) maxI * exp(-t.^2 / (2 * tau.^2)); 
+maxI = max(EOR(401,:));
+hold on
+a = area(T(:,1) - 0.1,intensity(T(:,1),maxI));
+a.FaceAlpha = 0.4;
+a.LineStyle = "none"
+pbaspect([1 1 1])
+set(gca,'FontSize',FontSize);
+set(gcf,'position', [200 , 200 , 200 + 200, 200 + 120]);
+exportgraphics(gcf, [setdir, 'section_EOR.png'],'resolution', 300);
 
+
+figure;
+plot(T(:,1), EPD(412,:),'Color','#FFA500','LineWidth',1)
+xlim([-0.3,1.5]); %ylim([-5,5]*1e4)
+tau = 30e-15 * 1e12;
+intensity = @(t,maxI) maxI * exp(-t.^2 / (2 * tau.^2)); 
+maxI = 2644720;
+pbaspect([1 1 1])
+set(gca,'FontSize',FontSize);
+set(gcf,'position', [200 , 200 , 200 + 200, 200 + 120]);
+exportgraphics(gcf, [setdir, 'section_EPD.png'],'resolution', 300);
 %%
 function plot_tile(x, y, z)
     FontSize = 10;
