@@ -3,10 +3,11 @@ close all
 
 params.e_w = linspace(-5,5,181);
 params.exp_theory_time_shift = 0.6;
-params.spot_size_fwhm_um_or = 80;
+params.spot_size_fwhm_um_or = 70;
 
-optimal_parameters.weight_pd = 1.2;
-optimal_parameters.weight_or = 1e3 * .8;
+common_fac = 0.9;
+optimal_parameters.weight_pd = 1.2 * 1 * common_fac ;
+optimal_parameters.weight_or = 1e4 * .8 * 4 * 2. * common_fac ;
 
 [tc, xc, EPD_xz] = get_fields_photodember_meep_intensities();
 % [~, ~, EPD_xz] = get_fields_photodember_meep();
@@ -14,14 +15,22 @@ optimal_parameters.weight_or = 1e3 * .8;
 [T, Z] = ndgrid(tc, xc);
 e_w = params.e_w;
 %%
-pulse_energy_list = [0.10    0.17    0.30    0.52    1.00    1.73    3.00    5.19   10.00 17.30 30.00];
-factor_mat = [1.5413    1.8102    2.5612    2.9008    1.7859    1.3690    1.4191    1.3701    1.0    0.7   (10/30) * 1.2];
+pulse_energy_list = [0.10    0.17    0.30    0.52    1.00    1.73    3.00    5.19   10.00 17.3 30.0];
+factor_mat = [1.5413    1.8102    2.5612    2.9008    1.7859    1.3690    1.4191    1.3701    1.0    1.1 * 10/17.3   1.12 * 10/30];
+
+max_epd = []
+max_eor = []
+max_etot = []
 
 for ii = 1:length(pulse_energy_list)
     intensity_weight_or = (pulse_energy_list(ii) / 10) * factor_mat(ii);
     EOR = EOR_zz * optimal_parameters.weight_or * intensity_weight_or;
-    EPD = EPD_xz{ii} * optimal_parameters.weight_pd;
+    EPD = movmean(EPD_xz{ii},10,1) * optimal_parameters.weight_pd;
+%     EPD(abs(Z')>40) = 0;
     [t_w_0 , psi_incoherent_comb{ii}] = calculate_incoherent_spectrum_from_fields(EOR + EPD, T, Z, e_w);
+    max_epd = [max_epd , max(abs(EPD(:)))]
+    max_eor = [max_eor , max(abs(EOR(:)))]
+    max_etot = [max_etot , max(abs(EPD(:) + EOR(:)))]
 end
 
 
@@ -57,7 +66,7 @@ ttt = tiledlayout(3,4,"TileSpacing","compact");
 % ax1.Layout.Tile = 5;
 ttt.Padding = "loose";
 nexttile
-imagesc(energy, deltat - 0.3, eels_measure{9});
+imagesc(energy, deltat - 0.3, eels_measure{8});
     ylim([-1,1.5]);
     xlim([-5,5]);
 set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,[],'','',FontSize,[0.3 0.3 0.3])
@@ -164,23 +173,24 @@ exportgraphics(gcf, 'meep_results/results/power_fig_4.png', 'Resolution',300);
 
 
 %%
-function [tc, xc, field_pd] = get_fields_photodember_meep()
-
-    load('meep_results/saved_matrices_meep/photodember/spot_size_30_shift04/field_ez_pd_intensity_10t0_0.5.mat')
-    xc =  - zstep * size(e_pd,2) / 2 : zstep:  zstep * size(e_pd,2) / 2 - zstep;
-    tc = tstep : tstep : tstep * size(e_pd,1);
-    field_pd = e_pd.';
-
-end
+% function [tc, xc, field_pd] = get_fields_photodember_meep()
+% 
+%     load('meep_results/saved_matrices_meep/photodember/spot_size_30_shift04/field_ez_pd_intensity_10t0_0.5.mat')
+%     xc =  - zstep * size(e_pd,2) / 2 : zstep:  zstep * size(e_pd,2) / 2 - zstep;
+%     tc = tstep : tstep : tstep * size(e_pd,1);
+%     field_pd = e_pd.';
+% 
+% end
 
 function [tc, xc, field_pd] = get_fields_photodember_meep_intensities()
     
     pulse_energy_list = [0.10    0.17    0.30    0.52    1.00    1.73    3.00    5.19   10.00 17.30 30.00];
     formatSpec = '%.2f'
-    dir = 'meep_results/saved_matrices_meep/photodember/varying_intensities/'
+%     dir = 'meep_results/saved_matrices_meep/photodember/test/'
+    dir = 'meep_results\saved_matrices_meep\photodember\combined\';
     for pe = 1:length(pulse_energy_list)
 
-        filename = strcat(dir,'field_ez_pd_intensity_',num2str(pulse_energy_list(pe),formatSpec),'t0_0.5.mat');
+        filename = strcat(dir,'field_ez_pd_intensity_',num2str(pulse_energy_list(pe),formatSpec),'t0_0.6fwhm_t_50.mat');
         load(filename);
         field_pd{pe} = e_pd.'
     end

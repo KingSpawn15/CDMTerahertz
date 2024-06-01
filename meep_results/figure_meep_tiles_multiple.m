@@ -3,10 +3,11 @@ close all
 
 params.e_w = linspace(-5,5,181);
 params.exp_theory_time_shift = 0.6;
-params.spot_size_fwhm_um_or = 80;
+params.spot_size_fwhm_um_or = 70;
 
-optimal_parameters.weight_pd = 1.2;
-optimal_parameters.weight_or = 1e3 * .8;
+common_fac = 0.9;
+optimal_parameters.weight_pd = 1.2 * 1 * common_fac ;
+optimal_parameters.weight_or = 1e4 * .8 * 4 * 2. * common_fac ;
 
 [~, ~, EPD_xz] = get_fields_photodember_meep();
 [tc, xc, EOR_xz, EOR_yz, EOR_zz] = get_fields_rectification(params.spot_size_fwhm_um_or);
@@ -82,7 +83,9 @@ exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',500);
 %%
 function [tc, xc, field_pd] = get_fields_photodember_meep()
 
-    load('meep_results/saved_matrices_meep/photodember/spot_size_30_shift04/field_ez_pd_intensity_10t0_0.5.mat')
+    load('meep_results\saved_matrices_meep\photodember\combined\field_ez_pd_intensity_10.00t0_0.6fwhm_t_50.mat')
+%     load('meep_results\saved_matrices_meep\photodember\test\field_ez_pd_intensity_10.00t0_0.5fwhm_t_50.mat')
+%     load('meep_results\saved_matrices_meep\photodember\varying_intensities\field_ez_pd_intensity_5.19t0_0.5.mat')
     xc =  - zstep * size(e_pd,2) / 2 : zstep:  zstep * size(e_pd,2) / 2 - zstep;
     tc = tstep : tstep : tstep * size(e_pd,1);
     field_pd = e_pd.';

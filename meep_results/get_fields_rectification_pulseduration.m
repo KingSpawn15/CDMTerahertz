@@ -1,6 +1,6 @@
-function [tc, xc, field_laser_profile_x, field_laser_profile_y, field_laser_profile_z] = get_fields_rectification(spot_size_fwhm)
-%     load('meep_results\saved_matrices_meep\triple_test_ez_3\field_ez50.0_fsshift0.3_ps.mat')
-    load('meep_results\saved_matrices_meep\rectification_pulse_time\field_ez50.0_fsshift0.4_ps.mat')
+function [tc, xc, field_laser_profile_x, field_laser_profile_y, field_laser_profile_z] = get_fields_rectification_pulseduration(spot_size_fwhm, filename)
+    
+    load(filename)
     
     xc =  - zstep * size(e_or_x,2) / 2 : zstep:  zstep * size(e_or_x,2) / 2 - zstep;
     tc = tstep : tstep : tstep * size(e_or_x,1);
