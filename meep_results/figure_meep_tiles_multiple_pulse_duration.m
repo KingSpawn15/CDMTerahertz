@@ -5,10 +5,10 @@ close all
 [eels_spectra, Energy, Time] = get_measurement_duration();
 %%
 params.e_w = linspace(-5,5,181);
-params.exp_theory_time_shift = 0.6;
+params.exp_theory_time_shift = 0.7;
 params.spot_size_fwhm_um_or = 70;
 
-common_fac = 0.9;
+common_fac = 0.9 * 3e2;
 optimal_parameters.weight_pd = 1.2 * 1 * common_fac ;
 optimal_parameters.weight_or = 1e4 * .8 * 4 * 2. * common_fac ;
 
@@ -16,7 +16,8 @@ optimal_parameters.weight_or = 1e4 * .8 * 4 * 2. * common_fac ;
 % [tc, xc, EOR_xz, EOR_yz, EOR_zz] = get_fields_rectification(params.spot_size_fwhm_um_or);
 
 
-pulse_duration_list = [50, 70, 90, 110, 130, 150, 170, 190, 250, 300, 350];
+% pulse_duration_list = [50, 70, 90, 110, 130, 150, 170, 190, 250, 300, 350];
+pulse_duration_list = [50, 70, 110, 130, 170, 190, 250, 300, 350];
 % pulse_duration_list = [50 150];
 for ind = 1 : length(pulse_duration_list)
     filename = strcat('meep_results\saved_matrices_meep\rectification_pulse_time\field_ez',num2str(pulse_duration_list(ind)),'.0_fsshift0.4_ps.mat');
@@ -91,7 +92,7 @@ for ii = 1:length(pulse_duration_list)
 plot_tile(e_w,t_w, psi_incoherent_comb{ii});
 set_axis_properties(gca,FontSize,FontName,0.01,[],[],'','',FontSize,[0 0 0, 0]);
 if ii ==1
-set_axis_properties(gca,FontSize,FontName,0.01,[-1:0.5:1.5],[-4:2:4],'','',FontSize,[0 0 0, 0]);
+set_axis_properties(gca,FontSize,FontName,0.01,[-1:0.5:1.5],[],'','',FontSize,[0 0 0, 0]);
 end
 end
 
@@ -99,7 +100,7 @@ for ii = 1:length(pulse_duration_list)
 plot_tile(e_w,t_w, psi_incoherent_or{ii});
 set_axis_properties(gca,FontSize,FontName,0.01,[],[],'','',FontSize,[0 0 0, 0]);
 if ii ==1
-set_axis_properties(gca,FontSize,FontName,0.01,[-1:0.5:1.5],[-4:2:4],'','',FontSize,[0 0 0, 0]);
+set_axis_properties(gca,FontSize,FontName,0.01,[-1:0.5:1.5],[],'','',FontSize,[0 0 0, 0]);
 end
 end
 
@@ -111,7 +112,7 @@ set_axis_properties(gca,FontSize,FontName,0.01,[-1:0.5:1.5],[-4:2:4],'','',FontS
 end
 end
 
-set(gcf,'Position',[200,200,200 + 120 * length(pulse_duration_list), 200 +  320]);
+set(gcf,'Position',[200,200,200 + 120 * length(pulse_duration_list), 200 +  480]);
 
 
 exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',500);

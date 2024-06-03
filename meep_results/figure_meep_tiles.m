@@ -2,10 +2,10 @@ clear all
 close all
 
 params.e_w = linspace(-5,5,181);
-params.exp_theory_time_shift = 0.6;
+params.exp_theory_time_shift = 0.7;
 params.spot_size_fwhm_um_or = 70;
 
-common_fac = .9;
+common_fac = .9 * 3e2;
 optimal_parameters.weight_pd = 1.2 * 1 * common_fac ;
 optimal_parameters.weight_or = 1e4 * .8 * 4 * 2. * common_fac ;
 
