@@ -16,7 +16,8 @@ e_w = params.e_w;
 
 [TM, ZM, EPDM] = load_michael_pd();
 
-EOR = EOR_zz * optimal_parameters.weight_or;
+% EOR = EOR_zz * optimal_parameters.weight_or;
+EOR = EOR_xz * optimal_parameters.weight_or * (1/sqrt(2));
 EPD = EPD_xz * optimal_parameters.weight_pd;
 
 
@@ -27,7 +28,7 @@ FontSize = 15;
 clim  = max(abs(EOR(:)));
 clim_pd  = max(abs(EPD(:)));
 setdir = 'meep_results/results/';
-create_figure_electricfield(T-.5, Z, EOR, clim, setdir, 'field_rectification.png', FontSize);
+create_figure_electricfield(T-.5, Z, EOR, clim, setdir, 'field_rectification_inplane.png', FontSize);
 create_figure_electricfield(T-.5, Z, movmean(movmean(EPD,5,2),2,1), clim_pd, setdir, 'field_photodember.png', FontSize);
 
 
