@@ -235,6 +235,11 @@ errorbar(com(10,2:1:end),deltat(2:1:end) - .3,errs(10,2:1:end)/2,'horizontal', .
     'LineWidth',1.5,'LineStyle','none');
 set(gcf,'Position',[200,200,200 + 400,200 + 200]);
 exportgraphics(gcf, 'article_check/results/error_analysis.png', 'Resolution',300);
+
+max_exp = []
+for i = 1:11
+    max_exp = [max_exp, max(abs(com_2(i,:)))]
+end
 %%
 
 
@@ -281,31 +286,74 @@ fplot(@(x) param(1) .*x ./ param(2), [min(xdata), max(xdata)],'--',LineWidth=2);
 xlim([-5, 35]);
 ylim([0, param(1) * 1.5]);
 %%
+
+
 close all;
 figure;
 T = tiledlayout(1,1,"TileSpacing","compact");
+ax3 = axes(T);
 ax1 = axes(T);
 ax2 = axes(T);
 
-plot(ax2,pulse_energy_list * 159, ecomb_max,'LineStyle','none', ...
+
+
+plot(ax2,pulse_energy_list, eor_max,'LineStyle','none', ...
+    'Marker','d','MarkerEdgeColor','k','MarkerFaceColor','k'); 
+hold on;
+
+
+plot(ax2,pulse_energy_list, epd_max * 10,'LineStyle','none', ...
     'Marker','o','MarkerEdgeColor','k','MarkerFaceColor','k'); 
-
-fplot(ax1,@(x)saturate(param,x), [min(xdata), max(xdata)],'color','#b30000',LineWidth=2);
-
-set_axis_properties(ax1,FontSize+4,FontName,1,1e6*[0:0.5:6],0:5:30,'','',FontSize,[0.3 0.3 0.3])
-set_axis_properties(ax2,FontSize+4,FontName,1,1e6*[0:0.5:6],[0:5:30] * 200,'','',FontSize,[0.3 0.3 0.3])
-
-
-ax2.XAxisLocation = 'top';
-ax2.YAxisLocation = 'right';
-ax2.YTick = [];
-ax2.Color = 'none';
-ax2.XColor = '#b30000';
-ax1.Box = 'off';
 ax2.Box = 'off';
+ax2.Color = 'none';
+ax2.XTick = [];
+ax2.YTick = [];
+ax2.XAxis.Visible = 'off';
+ax2.YAxis.Visible = 'off';
 
-ylim(ax2, [0,4.5e6]);
-ylim(ax1, [0,4.5e6]);
+
+fplot(ax1,@(x)saturate(param,x/159), [min(xdata) * 159, max(xdata)*159],'k--',LineWidth=2);
+ax1.Box = 'off';
+ax1.Color = 'none';
+ax1.XTick = [];
+ax1.YTick = [];
+ax1.XAxis.Visible = 'off';
+ax1.YAxis.Visible = 'off';
+
+
+plot(ax3, pulse_energy_list, max_exp, 'Color','#0000CD','LineWidth',2, ...
+    'MarkerSize',8,'Marker','s','MarkerEdgeColor','#00008B','MarkerFaceColor','#6495ED'); 
+ax3.Box = 'off';
+ax3.Color = 'none';
+ax3.XTick = [];
+ax3.YTick = [];
+ax3.XAxis.Visible = 'off';
+ax3.YAxis.Visible = 'off';
+
+ax2.XAxisLocation = 'bottom';
+ax2.XAxis.Visible = 'on';
+ax2.XTick = [0:5:30];
+ax2.YLim = [0,7e6];
+
+ax1.XAxisLocation = 'top';
+ax1.XAxis.Visible = 'on';
+ax1.XTick = [0:5:30] * 200;
+ax1.YAxisLocation = 'left';
+ax1.YAxis.Visible = 'on';
+ax1.YTick = [0:1:7]*1e6;
+ax1.YLim = [0,7e6];
+
+
+ax3.YAxisLocation = 'right';
+ax3.YAxis.Visible = 'on';
+ax3.YTick = [0:0.5:5];
+ax3.YLim = [0,5];
+set(ax3,'YColor','#0000CD');
+
+ax1.FontSize = FontSize+4;
+ax2.FontSize = FontSize+4;
+ax3.FontSize = FontSize+4;
+
 
 AxisObject = ax1;   % Asigns the axis to a variable
 ExponentToBeUsedLater = AxisObject.YAxis.Exponent; % Stores the exponent for later, since it is going to be erased

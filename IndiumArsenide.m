@@ -92,6 +92,15 @@ classdef IndiumArsenide < handle
             omega_y = sqrt( (Q_E^2/self.kappa).*(n_exc.*gaussian_laser_spot.*exp(-self.alpha.*yprime_grid).*...
                 (1/self.me0tilda+1/self.mh)+self.n_eq/self.m_eq) - (self.gamma/2)^2 );
         end
+
+        function omega_y_0 = calculate_omega_y_0(self, n_exc)
+            const = utils.constants_fundamantal();
+            Q_E = const.('Q_E');
+            
+            omega_y_0 = sqrt( (Q_E^2/self.kappa).*(n_exc.*...
+                (1/self.me0tilda+1/self.mh)+self.n_eq/self.m_eq) - (self.gamma/2)^2 );
+        end
+
         
     end
 end
