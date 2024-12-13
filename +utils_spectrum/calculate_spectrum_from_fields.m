@@ -25,7 +25,7 @@
 function [t0_vec, eels] = calculate_spectrum_from_fields(EOR, TOR, ZOR)
 
 EOR = EOR.';
-max_z = 50e-6;
+max_z = 90e-6;
 velec = 0.7 * 3 * 10^(8-12);
 
 electron_z = (-3 : 0.01: 3).' .* max_z;

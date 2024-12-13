@@ -6,7 +6,7 @@ params.exp_theory_time_shift = 0.7;
 params.spot_size_fwhm_um_or = 70;
 
 common_fac = .9 * 3e2;
-optimal_parameters.weight_pd = 1.2 * 1 * common_fac ;
+optimal_parameters.weight_pd = 1.2 * 1 * common_fac * 1e20 * (-2);
 optimal_parameters.weight_or = 1e4 * .8 * 4 * 2. * common_fac ;
 
 [~, ~, EPD_xz] = get_fields_photodember_meep();
@@ -15,10 +15,21 @@ optimal_parameters.weight_or = 1e4 * .8 * 4 * 2. * common_fac ;
 e_w = params.e_w;
 %%
 
-EOR = (EOR_zz ) * optimal_parameters.weight_or;
+EOR = (EOR_zz + EOR_xz * (1/sqrt(2))) * optimal_parameters.weight_or;
 EOR_ip = - (EOR_xz ) * optimal_parameters.weight_or * (1/sqrt(2));
 EPD = EPD_xz * optimal_parameters.weight_pd;
 
+%% Create fields
+
+close all;
+FontName = 'ariel';
+FontSize = 15;
+clim  = max(abs(EOR(:)));
+clim_pd  = max(abs(EPD(:)));
+setdir = 'meep_results/results/drift_diffusion/';
+create_figure_electricfield(T-.5, Z, movmean(movmean(EPD,5,2),2,1), clim_pd, setdir, 'field_photodember_sigma_t_0.02.png', FontSize);
+
+%%
 [t_w_0 , psi_incoherent_comb_0] = calculate_incoherent_spectrum_from_fields(-EOR + EPD + EOR_ip, T, Z, e_w);
 [~ , psi_incoherent_comb_45] = calculate_incoherent_spectrum_from_fields(EPD + EOR_ip, T, Z, e_w);
 [~ , psi_incoherent_comb_90] = calculate_incoherent_spectrum_from_fields(EOR + EPD + EOR_ip, T, Z, e_w);
@@ -36,14 +47,15 @@ EPD = EPD_xz * optimal_parameters.weight_pd;
 [~, deltat, energy, eels_measure_90] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(90));
 
 
+
 %%
     
 t_w = t_w_0 - params.exp_theory_time_shift;
-setdir = 'meep_results/results/';
+setdir = 'meep_results/results/drift_diffusion/';
 close all
 close all
 figure;
-image_name = strcat('tiles_meep_inplane_2');
+image_name = strcat('spectrum_sigma_t_0.1');
 FontName = 'ariel';
 FontSize = 14;
 ttt = tiledlayout(3,4,"TileSpacing","compact");
@@ -76,8 +88,8 @@ exportgraphics(gcf, [setdir,image_name,'.png'], 'Resolution',300);
 
 %%
 function [tc, xc, field_pd] = get_fields_photodember_meep()
-
-    load('meep_results\saved_matrices_meep\photodember\combined\field_ez_pd_intensity_10.00t0_0.6fwhm_t_50.mat')
+    load('meep_results\saved_matrices_meep\photodember\drift_diffusion\field_ez_pd_intensity_10t0_0.5fwhm_t_50sigma_t_0.02.mat')
+%     load('meep_results\saved_matrices_meep\photodember\combined\field_ez_pd_intensity_10.00t0_0.6fwhm_t_50.mat')
 %     load('meep_results\saved_matrices_meep\photodember\test\field_ez_pd_intensity_10.00t0_0.5fwhm_t_50.mat')
 %     load('meep_results\saved_matrices_meep\photodember\varying_intensities\field_ez_pd_intensity_5.19t0_0.5.mat')
     xc =  - zstep * size(e_pd,2) / 2 : zstep:  zstep * size(e_pd,2) / 2 - zstep;
@@ -121,3 +133,22 @@ function set_axis_properties(ax,FontSize,FontName,LineWidth,YTick,XTick,ylabel_s
     xlabel(xlabel_str,'Color',label_Color,'FontSize',label_FontSize);
 end
 
+function create_figure_electricfield(T, Z, E, clim, setdir, filename, FontSize)
+    figure;
+    imagesc(T(:,1), Z(1,:), E, 'Interpolation', 'bilinear',[-clim, clim]);
+    set(gca,'FontSize',FontSize);
+    xlim([-.3,1.5]);
+    ylim([-60,60]);
+    yticks(-60:20:60)
+    xticks(-.3:.3:1.5)
+    colormap(utils.redblue);
+    pbaspect([1 1 1])
+    set(gcf,'position', [200 , 200 , 200 + 200, 200 + 120]);
+    colorbar;
+%     l0 = create_line(0); l1 = create_line(0.3); l2 = create_line(0.7); 
+
+    set(groot,'defaultAxesXTickLabelRotationMode','manual');
+    exportgraphics(gcf, [setdir, filename],'resolution', 300);
+
+    
+end

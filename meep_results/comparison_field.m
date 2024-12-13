@@ -15,9 +15,9 @@ optimal_parameters.weight_or = 1e4 * .8 * 4 * 2. * common_fac ;
 e_w = params.e_w;
 
 [TM, ZM, EPDM] = load_michael_pd();
-
-% EOR = EOR_zz * optimal_parameters.weight_or;
-EOR = EOR_xz * optimal_parameters.weight_or * (1/sqrt(2));
+%%
+EOR = EOR_zz * optimal_parameters.weight_or;
+% EOR = EOR_xz * optimal_parameters.weight_or * (1/sqrt(2));
 EPD = EPD_xz * optimal_parameters.weight_pd;
 
 
