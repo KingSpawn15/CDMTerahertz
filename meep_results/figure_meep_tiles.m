@@ -9,7 +9,7 @@ close all
 params.e_w = linspace(-5, 5, 271);
 params.exp_theory_time_shift = 0.1;
 
-common_fac = 1;
+common_fac =  1.46 * 0.9281;
 optimal_parameters.weight_pd = common_fac * (-0.09 * 1e18);
 optimal_parameters.weight_or = common_fac * (1 * 1e9);
 
@@ -20,7 +20,7 @@ e_w = params.e_w;
 % Parameter ranges
 shift_values = [-32];
 adjust_or_values = [1];[1.2];
-adjust_pd_values = [0.8];
+adjust_pd_values = [0.7];[0.8];
 spotsize_values = [117];
 
 
@@ -33,11 +33,11 @@ for spotsize = spotsize_values
     for shift = shift_values
         for adjust_or = adjust_or_values
             for adjust_pd = adjust_pd_values
-                close all;
+                
                 % Apply adjustments
                 EPD = shiftWithZeros2D(EPD_xz * optimal_parameters.weight_pd * adjust_pd, 0, shift);
                 EOR = (EOR_zz) * optimal_parameters.weight_or * adjust_or;
-                EOR_45 = (1/sqrt(2)) * (EOR_xz) * optimal_parameters.weight_or * adjust_or;
+                EOR_45 = 0 * (1/sqrt(2)) * (EOR_xz) * optimal_parameters.weight_or * adjust_or;
                 % Calculate spectra
                 [t_w_0, psi_incoherent_comb_0] = calculate_incoherent_spectrum_from_fields(-EOR + EPD + EOR_45, T, Z, e_w);
                 [~, psi_incoherent_comb_45] = calculate_incoherent_spectrum_from_fields(EPD+ EOR_45, T, Z, e_w);
@@ -58,8 +58,9 @@ for spotsize = spotsize_values
                 t_w = t_w_0 - params.exp_theory_time_shift;
                 
                 % Create and save plot
+                close all;
                 figure;
-                image_name = strcat('tiles_meep_', 'shift', num2str(shift), '_or', num2str(adjust_or), '_pd', num2str(adjust_pd), '_spotsize', num2str(spotsize));
+                image_name = strcat('diffusion_model_tiles_meep_', 'shift', num2str(shift), '_or', num2str(adjust_or), '_pd', num2str(adjust_pd), '_spotsize', num2str(spotsize));
                 FontName = 'ariel';
                 FontSize = 14;
                 ttt = tiledlayout(3, 4, "TileSpacing", "compact");
@@ -104,10 +105,127 @@ FontSize = 15;
 clim  = max(abs(EOR(:)));
 clim_pd  = max(abs(EPD(:)));
 % setdir = 'meep_results/results/electron_velocity';
-create_figure_electricfield(T, Z, EOR, clim, setdir, 'field_rectification.png', FontSize);
-create_figure_electricfield(T, Z, EPD, clim_pd, setdir, 'field_photodember.png', FontSize);
+create_figure_electricfield(T, Z, EOR, clim, setdir, 'diffusion_model_field_rectification.png', FontSize);
+create_figure_electricfield(T, Z, EPD, clim_pd, setdir, 'diffusion_model_field_photodember.png', FontSize);
 
 
+%%
+% Error analysis stuff
+
+
+
+
+%%
+% error analysis figure
+% [~, deltat, energy, eels_measure_90] = utils_spectrum.get_measurement(utils_spectrum.angle_hwp_calculator(90));
+[com_exp, errs_exp] = getmeasurement_power_max(eels_measure_90, energy, deltat);
+[com_sim, errs_sim] = getsimulation_power_max(psi_incoherent_comb_90, e_w, t_w);
+close all
+figure;
+set(groot,'defaultAxesXTickLabelRotationMode','manual')
+FontName = 'ariel';
+FontSize = 14;
+ttt = tiledlayout(1,2,"TileSpacing","compact");
+% ax1 = axes(ttt);
+% ax1.Layout.Tile = 5;
+ttt.Padding = "loose";
+nexttile
+imagesc(e_w, t_w, psi_incoherent_comb_90);
+    ylim([-1,1.5]);
+    xlim([-5,5]);
+    set_axis_properties(gca,FontSize,FontName,1,-1:0.5:1.5,-4:2:4,'','',FontSize,[0.3 0.3 0.3])
+    colormap jet
+    axis square
+hold on
+errorbar(com_sim(2:1:end),t_w(2:1:end) - .3,errs_sim(2:1:end)/2,'horizontal', ...
+    'Color',[1 1 1] * .7, ...
+    'LineWidth',1.5,'LineStyle','none');
+
+nexttile
+imagesc(energy, deltat- 0.3, eels_measure_90);
+    ylim([-1,1.5]);
+    xlim([-5,5]);
+    set_axis_properties(gca,FontSize,FontName,1,[],-4:2:4,'','',FontSize,[0.3 0.3 0.3])
+    colormap jet
+    axis square
+hold on
+errorbar(com_exp(2:1:end),deltat(2:1:end) - .3,errs_exp(2:1:end)/2,'horizontal', ...
+    'Color',[1 1 1] * .7, ...
+    'LineWidth',1.5,'LineStyle','none');
+set(gcf,'Position',[200,200,200 + 400,200 + 200]);
+% exportgraphics(gcf, 'article_check/results/error_analysis.png', 'Resolution',300);
+
+% max_exp = []
+% for i = 1:11
+%     max_exp = [max_exp, max(abs(com_2(i,:)))]
+% end
+
+
+%%
+
+function [com_exp, errs_exp] = getmeasurement_power_max(eels_measure, energy, deltat)
+
+    x_c = zeros(1, size(deltat,2));
+    errs_exp = ones(1, size(deltat,2));
+
+    for ii = 1:1
+%         eels = squeeze(cell2mat(DataSetCropAll(ii)))';
+%         eels = eels ./ sqrt(sum(eels.^2, 2));
+%         eels_measure{ii} = eels;
+         
+        mass_matrix = eels_measure;
+        % Initialize a vector to store the x coordinates of the center of mass of each row
+%         errs = zeros(1, size(deltat,2));
+        for i = 1:size(eels_measure,1)
+%             row_mass = sum(mass_matrix(i,:));
+            for j = 1:size(eels_measure,2)
+                [~, ind_max] = max(mass_matrix(i,:));
+                x_c(ii,i) = ind_max;
+            end
+            x_c(ii,i) = x_c(ii,i);
+
+            errs_exp(ii,i) = energy(find(mass_matrix(i,:) > 0.7 * max(mass_matrix(i,:)),1,'last')) - ...
+            energy(find(mass_matrix(i,:) >  0.7 * max(mass_matrix(i,:)),1,'first'));
+
+        end
+    end
+
+    com_exp = energy(floor(x_c));
+end
+
+function [com, errs] = getsimulation_power_max(eels, e_w, t_w)
+%     load('saved_matrices\PulseEnergy.mat')
+%     deltat = Time;
+    energy = e_w;
+
+    
+    x_c = zeros(1, size(t_w,2));
+    errs = ones(1, size(t_w,2));
+
+%     for ii = 1:11
+%         eels = squeeze(cell2mat(DataSetCropAll(ii)))';
+%         eels = eels ./ sqrt(sum(eels.^2, 2));
+%         eels_measure{ii} = eels;
+         
+        mass_matrix = eels;
+        % Initialize a vector to store the x coordinates of the center of mass of each row
+%         errs = zeros(1, size(deltat,2));
+        for i = 1:size(eels,1)
+%             row_mass = sum(mass_matrix(i,:));z
+            for j = 1:size(eels,2)
+                [~, ind_max] = max(mass_matrix(i,:));
+                x_c(1,i) = ind_max;
+            end
+            x_c(1,i) = x_c(1,i);
+
+            errs(1,i) = energy(find(mass_matrix(i,:) > 0.7 * max(mass_matrix(i,:)),1,'last')) - ...
+            energy(find(mass_matrix(i,:) >  0.7 * max(mass_matrix(i,:)),1,'first'));
+
+        end
+%     end
+
+    com = energy(floor(x_c));
+end
 
 function ll = create_line(deltat, vel)
     c = 3*10^(8 - 12 +6);

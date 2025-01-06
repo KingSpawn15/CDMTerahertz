@@ -5,5 +5,5 @@ function [t_w , psi_incoherent] = calculate_incoherent_spectrum_from_fields(EZ, 
     eels_photodember = setup_parameters_eels_photodember(10, 40e-6);
     w = eels_photodember.electron.incoherent_gaussian_blurring_window(e_w,t_w);
     psi_incoherent =  eels_photodember.incoherent_convolution(psi_assemb, w, t_w, e_w);
-
+    psi_incoherent = psi_incoherent ./ sqrt(sum(psi_incoherent.^2,2));
 end

@@ -1,6 +1,8 @@
 function [tc, xc, field_laser_profile_x, field_laser_profile_y, field_laser_profile_z] = get_fields_rectification(spot_size_fwhm)
 %     load('meep_results\saved_matrices_meep\triple_test_ez_3\field_ez50.0_fsshift0.3_ps.mat')
-    load('meep_results\saved_matrices_meep\rectification_eps_12\field_ez50_fsshift0.1_ps.mat')
+%     load('meep_results\saved_matrices_meep\rectification_eps_12\field_ez50_fsshift0.1_ps.mat')
+    load('meep_results\saved_matrices_meep\rectification_eps_12\field_ez_with_derivative_50_fsshift0.1_ps.mat')
+
     
     xc =  - zstep * size(e_or_x,2) / 2 : zstep:  zstep * size(e_or_x,2) / 2 - zstep;
     tc = tstep : tstep : tstep * size(e_or_x,1);
